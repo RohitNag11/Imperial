@@ -34,14 +34,13 @@ def get_rot_mat(theta_deg=0, degree=2, axis='z'):
 
 def p_coordinate(x, covar):
     '''
-    Calulcates the probability distribution function for a given coordinate.
+    Calulcates the probability for a given coordinate from an assumed normal probability distributions.
     Note: mean = [0, 0]^T
     Returns: a float
     '''
-    e, pi = np.e, np.pi
     pow = -0.5 * mat_mul([x.T, np.linalg.inv(covar), x])
-    coeff = 1 / (2 * pi * np.sqrt(np.linalg.det(covar)))
-    return coeff * e**pow
+    coeff = 1 / (2 * np.pi * np.sqrt(np.linalg.det(covar)))
+    return coeff * np.exp(pow)
 
 
 def p_grid(grid_points, covar):
@@ -53,4 +52,13 @@ def p_grid(grid_points, covar):
     mul = np.matmul(grid_points, np.linalg.inv(covar)) * grid_points
     pow = -0.5 * np.sum(mul, axis=1)
     coeff = 1 / (2 * np.pi * np.sqrt(np.linalg.det(covar)))
+    return coeff * np.exp(pow)
+
+
+def gaussian(x=0, mean=0, std=1):
+    '''
+    Calculates the gaussian function for a given x, mean and standard deviation.
+    '''
+    pow = -0.5 * ((x - mean) / std)**2
+    coeff = 1 / (np.sqrt(2 * np.pi) * std)
     return coeff * np.exp(pow)
