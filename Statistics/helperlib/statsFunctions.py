@@ -6,8 +6,8 @@ def summarise_data(data, name='Data'):
         'median': data.median(),
         'lowerq': data.quantile(0.25),
         'upperq': data.quantile(0.75),
-        'min': max(data),
-        'max': min(data)
+        'min': min(data),
+        'max': max(data)
     }
 
     dispersion_dict = {
