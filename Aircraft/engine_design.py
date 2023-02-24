@@ -1,7 +1,6 @@
 import numpy as np
 from src.turbomach_analyser import Engine
 from src.utils import plots
-import matplotlib.pyplot as plt
 
 
 def get_constants():
@@ -24,20 +23,23 @@ def get_engine_constants():
         'inner_fan_pressure_ratio': 1.8,
         'outer_fan_pressure_ratio': 2.5,
         'comp_axial_velocity': 190,
+        'turbine_axial_velocity': 150,
         'lpc_pressure_ratio': 2.5,
         'per_stage_pressure_ratio': 1.3,
+        'lpt_work_coefficient': 2.5,
+        'hpt_work_coefficient': 1.2,
+        'hpt_angular_velocity': 700,
         'P_025': 91802,
         'T_025': 331.86,
         'P_03': 1468830,
         'T_03': 758.17,
         'P_044': 410468,
         'T_044': 1268.72,
-        'P_045': 410468,
+        'P_045': 402258,
         'T_045': 1268.72,
         'P_05': 82688,
         'T_05': 892.91,
         'min_blade_length': 0.012,
-        'lpt_work_coefficient': 0.9
     }
 
 
@@ -65,9 +67,19 @@ def main():
     print(f'hpc blade lengths:{engine.hpc.blade_lengths}')
     print(f'hpc annulus areas:{engine.hpc.areas}')
     print('****')
+    print(f'hpt no of stages: {engine.hpt.no_of_stages}')
+    print(f'hpt inlet area: {engine.hpt.area_inlet}')
+    print(f'hpt exit area: {engine.hpt.area_exit}')
+    print(f'hpt angular velocity: {engine.hpt.angular_velocity}')
+    print(f'hpt mean radius: {engine.hpt.mean_radius}')
+    print(f'hpt pressure_ratios: {engine.hpt.pressure_ratios}')
+    print('****')
     print(f'lpt no of stages: {engine.lpt.no_of_stages}')
     print(f'lpt inlet area: {engine.lpt.area_inlet}')
     print(f'lpt exit area: {engine.lpt.area_exit}')
+    print(f'lpt angular velocity: {engine.lpt.angular_velocity}')
+    print(f'lpt mean radius: {engine.lpt.mean_radius}')
+    print(f'lpt pressure_ratios: {engine.lpt.pressure_ratios}')
 
     plots.draw_engine(engine)
 

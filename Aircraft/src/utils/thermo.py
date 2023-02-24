@@ -11,7 +11,7 @@ def get_velocity_from_mach_no(mach_no, T, SPEC_HEAT_RATIO, GAS_CONST):
 
 
 def get_static_density(stag_density, mach_no, SPEC_HEAT_RATIO):
-    return stag_density / (1 + (SPEC_HEAT_RATIO - 1) / 2 * mach_no**2) ** (SPEC_HEAT_RATIO / (SPEC_HEAT_RATIO - 1))
+    return stag_density * (1 + (SPEC_HEAT_RATIO - 1) / 2 * mach_no**2)**(-1 / (SPEC_HEAT_RATIO - 1))
 
 
 def get_mass_flow(area, velocity, density):
@@ -31,7 +31,10 @@ def get_speed_of_sound(temp, SPEC_HEAT_RATIO, GAS_CONST):
 
 
 def get_static_temp(stag_temp, axial_velocity, SPEC_HEAT_RATIO, GAS_CONST):
-    const = stag_temp * (SPEC_HEAT_RATIO - 1) * \
-        axial_velocity**2 / (SPEC_HEAT_RATIO * GAS_CONST)
-    static_temp = (stag_temp + (stag_temp**2 + 2*const)**0.5) / 2
+    # const = stag_temp * (SPEC_HEAT_RATIO - 1) * \
+    #     axial_velocity**2 / (SPEC_HEAT_RATIO * GAS_CONST)
+    # static_temp = (stag_temp + (stag_temp**2 + 2*const)**0.5) / 2
+    static_temp = stag_temp - \
+        (axial_velocity**2 / (SPEC_HEAT_RATIO * GAS_CONST)) * \
+        ((SPEC_HEAT_RATIO - 1) / 2)
     return static_temp

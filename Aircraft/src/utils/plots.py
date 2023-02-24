@@ -23,6 +23,15 @@ def draw_engine(engine):
                    engine.hpc.tip_diameters, 11+engine.lpc.no_of_stages, 'HPC')
     draw_turb_comp(ax, -engine.hpc.hub_diameters,
                    -engine.hpc.tip_diameters, 11+engine.lpc.no_of_stages)
+    draw_turb_comp(ax, engine.hpt.hub_diameters,
+                   engine.hpt.tip_diameters, 17+engine.hpt.no_of_stages, 'HPT')
+    draw_turb_comp(ax, -engine.hpt.hub_diameters,
+                   -engine.hpt.tip_diameters, 11+engine.hpt.no_of_stages)
+    draw_turb_comp(ax, engine.lpt.hub_diameters,
+                   engine.lpt.tip_diameters, 11+engine.lpt.no_of_stages, 'LPT')
+    draw_turb_comp(ax, -engine.lpt.hub_diameters,
+                   -engine.lpt.tip_diameters, 11+engine.lpt.no_of_stages)
+
     plt.show()
 
 

@@ -31,7 +31,7 @@ class Fan:
 
     def __get_angular_velocity(self):
         speed_of_sound = thermo.get_speed_of_sound(
-            self.__TEMP_SEA, self.__SPEC_HEAT_RATIO, self.__GAS_CONST)
+            0.75*self.__TEMP_SEA, self.__SPEC_HEAT_RATIO, self.__GAS_CONST)
         u_tip = speed_of_sound * self.tip_mach_no
         return geom.get_angular_velocity(u_tip, self.tip_diameter)
 

@@ -30,7 +30,7 @@ class TurboComponent:
                                                           self.T0_inlet,
                                                           self.__GAS_CONST)
 
-        # NOTE: Not sure if we should use stagnation temperature or static temperature
+        # NOTE: Static temp here is higher than the stagnation temp
         static_temp_exit = thermo.get_static_temp(
             self.T0_exit, self.axial_velocity, self.__SPEC_HEAT_RATIO, self.__GAS_CONST)
         static_temp_inlet = thermo.get_static_temp(

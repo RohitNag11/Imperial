@@ -9,8 +9,8 @@ def get_area_from_diameter(diameter):
     return np.pi * (diameter / 2)**2
 
 
-def get_angular_velocity(rotational_speed, diameter):
-    return rotational_speed * diameter / 2
+def get_angular_velocity(tangential_speed, diameter):
+    return 2 * tangential_speed / diameter
 
 
 def get_hub_diameter_from_blade_length(blade_length, annulus_area):
