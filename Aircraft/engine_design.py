@@ -1,6 +1,7 @@
 import numpy as np
 from src.turbomach_analyser import Engine
-from src.utils import plots
+from src.utils import plots, formatter
+import json
 
 
 def get_constants():
@@ -51,6 +52,7 @@ def main():
     engine = Engine(**engine_consts, **consts)
     components = [engine.fan, engine.lpc, engine.hpc, engine.hpt, engine.lpt]
     [print(f'{component}\n*****\n') for component in components]
+    formatter.save_obj_to_file(engine, 'Aircraft/engine_design.json')
     plots.draw_engine(engine)
 
 

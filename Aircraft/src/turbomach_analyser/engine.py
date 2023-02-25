@@ -2,7 +2,6 @@ import numpy as np
 from .compressor import Compressor
 from .turbine import Turbine
 from .fan import Fan
-from ..utils import thermo
 
 
 class Engine:
@@ -104,8 +103,6 @@ class Engine:
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
-        self.components = [self.fan, self.lpc, self.hpc, self.hpt, self.lpt]
-
         return
 
     def __get_T_021(self):
