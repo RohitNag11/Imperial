@@ -29,9 +29,8 @@ class Turbine(TurboComponent):
                          SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                          GAS_CONST=GAS_CONST)
         self.is_low_pressure = is_low_pressure
+        self.name = 'LPT' if is_low_pressure else 'HPT'
         self.blade_length = kwargs['min_blade_length'] if 'min_blade_length' in kwargs else None
-        # self.hub_diameter = kwargs['hub_diameter'] if 'hub_diameter' in kwargs else geom.get_hub_diameter_from_blade_length(
-        #     kwargs['min_blade_length'], self.area_exit)
         self.mean_radius = geom.get_mean_radius_from_blade_length(
             kwargs['min_blade_length'], self.area_inlet) if 'min_blade_length' in kwargs else kwargs['mean_radius']
         self.d_stag_enthalpy = thermo.get_delta_stag_enthalpy(
@@ -52,6 +51,19 @@ class Turbine(TurboComponent):
         self.mean_tangential_speeds = geom.get_tangential_speed(
             self.angular_velocity, self.tip_diameters)
         self.flow_coefficients = self.axial_velocity / self.mean_tangential_speeds
+
+    def __str__(self):
+        properties = {f'{self.name} no of stages: {self.no_of_stages}',
+                      f'{self.name} no of stages: {self.no_of_stages}',
+                      f'{self.name} inlet area: {self.area_inlet}',
+                      f'{self.name} exit area: {self.area_exit}',
+                      f'{self.name} angular velocity: {self.angular_velocity}',
+                      f'{self.name} mean radius: {self.mean_radius}',
+                      f'{self.name} flow coefficients: {self.flow_coefficients}',
+                      f'{self.name} tip mach nos: {self.tip_mach_nos}',
+                      f'{self.name} pressure ratios: {self.pressure_ratios}',
+                      f'{self.name} pressure ratio: {self.pressure_ratio}'}
+        return self.name + super().__str__() + ':' + '\n' + '\n'.join(properties)
 
     def __get_no_of_stages(self):
         n_stages = self.d_stag_enthalpy / (self.work_coefficient * (

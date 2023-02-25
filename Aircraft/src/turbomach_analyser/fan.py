@@ -29,6 +29,13 @@ class Fan:
         self.__TEMP_SEA = TEMP_SEA
         self.angular_velocity = self.__get_angular_velocity()
 
+    def __str__(self):
+        properties = {f'Fan tip diameter: {self.tip_diameter}',
+                      f'Inner Fan tip diameter:{self.inner_fan_tip_diameter}',
+                      f'Fan hub diameter:{self.hub_diameter}',
+                      f'Inner Fan mean radius:{self.inner_fan_mean_radius}', }
+        return 'Fan' + super().__str__() + ':' + '\n' + '\n'.join(properties)
+
     def __get_angular_velocity(self):
         speed_of_sound = thermo.get_speed_of_sound(
             0.75*self.__TEMP_SEA, self.__SPEC_HEAT_RATIO, self.__GAS_CONST)

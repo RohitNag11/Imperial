@@ -25,12 +25,22 @@ class Compressor(TurboComponent):
                          SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                          GAS_CONST=GAS_CONST)
         self.is_low_pressure = is_low_pressure
+        self.name = 'LPC' if is_low_pressure else 'HPC'
         self.per_stage_pressure_ratio = per_stage_pressure_ratio
         self.no_of_stages = int(np.ceil(
             np.log(self.pressure_ratio) / np.log(per_stage_pressure_ratio)))
         self.mean_radius = geom.get_mean_radius_from_blade_length(
             kwargs['final_blade_length'], self.area_exit) if 'final_blade_length' in kwargs else kwargs['mean_radius']
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
+
+    def __str__(self):
+        properties = {f'{self.name} tip diameter: {self.tip_diameters}',
+                      f'{self.name} hub diameter:{self.hub_diameters}',
+                      f'{self.name} mean radius:{self.mean_radius}',
+                      f'{self.name} hub-tip ratios:{self.hub_tip_ratios}',
+                      f'{self.name} blade lengths:{self.blade_lengths}',
+                      f'{self.name} annulus areas:{self.areas}', }
+        return self.name + super().__str__() + ':' + '\n' + '\n'.join(properties)
 
     def __get_geometry_of_stages(self):
         inlet_hub_d = geom.get_hub_diameter_from_mean_radius(
