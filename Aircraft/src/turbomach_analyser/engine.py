@@ -104,6 +104,7 @@ class Engine:
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
+        self.components = [self.fan, self.lpc, self.hpc, self.hpt, self.lpt]
 
         return
 
