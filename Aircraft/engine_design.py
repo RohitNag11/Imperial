@@ -24,11 +24,14 @@ def get_engine_constants():
         'outer_fan_pressure_ratio': 2.5,
         'comp_axial_velocity': 190,
         'turbine_axial_velocity': 150,
+        'turbine_isentropic_efficiency': 0.92,
         'lpc_pressure_ratio': 2.5,
         'per_stage_pressure_ratio': 1.3,
         'lpt_work_coefficient': 2.5,
-        'hpt_work_coefficient': 1.2,
-        'hpt_angular_velocity': 700,
+        'hpt_work_coefficient': 1.0,
+        'hpt_angular_velocity': 600,
+        'min_blade_length': 0.012,
+        'lpt_min_blade_length': 0.03,
         'P_025': 91802,
         'T_025': 331.86,
         'P_03': 1468830,
@@ -39,7 +42,6 @@ def get_engine_constants():
         'T_045': 1268.72,
         'P_05': 82688,
         'T_05': 892.91,
-        'min_blade_length': 0.012,
     }
 
 
@@ -47,39 +49,36 @@ def main():
     consts = get_constants()
     engine_consts = get_engine_constants()
     engine = Engine(**engine_consts, **consts)
+    compressors = {'LPC': engine.lpc, 'HPC': engine.hpc}
+    turbines = {'HPT': engine.hpt, 'LPT': engine.lpt}
 
     print(f'fan tip diameter: {engine.fan.tip_diameter}')
     print(f'inner fan tip diameter:{engine.fan.inner_fan_tip_diameter}')
     print(f'fan hub diameter:{engine.fan.hub_diameter}')
     print(f'inner fan mean radius:{engine.fan.inner_fan_mean_radius}')
     print('****')
-    print(f'lpc tip diameter: {engine.lpc.tip_diameters}')
-    print(f'lpc hub diameter:{engine.lpc.hub_diameters}')
-    print(f'lpc mean radius:{engine.lpc.mean_radius}')
-    print(f'lpc hub-tip ratios:{engine.lpc.hub_tip_ratios}')
-    print(f'lpc blade lengths:{engine.lpc.blade_lengths}')
-    print(f'lpc annulus areas:{engine.lpc.areas}')
-    print('****')
-    print(f'hpc tip diameter: {engine.hpc.tip_diameters}')
-    print(f'hpc hub diameter:{engine.hpc.hub_diameters}')
-    print(f'hpc mean radius:{engine.hpc.mean_radius}')
-    print(f'hpc hub-tip ratios:{engine.hpc.hub_tip_ratios}')
-    print(f'hpc blade lengths:{engine.hpc.blade_lengths}')
-    print(f'hpc annulus areas:{engine.hpc.areas}')
-    print('****')
-    print(f'hpt no of stages: {engine.hpt.no_of_stages}')
-    print(f'hpt inlet area: {engine.hpt.area_inlet}')
-    print(f'hpt exit area: {engine.hpt.area_exit}')
-    print(f'hpt angular velocity: {engine.hpt.angular_velocity}')
-    print(f'hpt mean radius: {engine.hpt.mean_radius}')
-    print(f'hpt pressure_ratios: {engine.hpt.pressure_ratios}')
-    print('****')
-    print(f'lpt no of stages: {engine.lpt.no_of_stages}')
-    print(f'lpt inlet area: {engine.lpt.area_inlet}')
-    print(f'lpt exit area: {engine.lpt.area_exit}')
-    print(f'lpt angular velocity: {engine.lpt.angular_velocity}')
-    print(f'lpt mean radius: {engine.lpt.mean_radius}')
-    print(f'lpt pressure_ratios: {engine.lpt.pressure_ratios}')
+    for name, compressor in compressors.items():
+        print(f'{name} tip diameter: {compressor.tip_diameters}')
+        print(f'{name} hub diameter:{compressor.hub_diameters}')
+        print(f'{name} mean radius:{compressor.mean_radius}')
+        print(f'{name} hub-tip ratios:{compressor.hub_tip_ratios}')
+        print(f'{name} blade lengths:{compressor.blade_lengths}')
+        print(f'{name} annulus areas:{compressor.areas}')
+        print('****')
+
+    for name, turbine in turbines.items():
+        print(f'{name} no of stages: {turbine.no_of_stages}')
+        print(f'{name} inlet area: {turbine.area_inlet}')
+        print(f'{name} exit area: {turbine.area_exit}')
+        print(f'{name} angular velocity: {turbine.angular_velocity}')
+        print(f'{name} mean radius: {turbine.mean_radius}')
+        print(f'{name} flow coefficients: {turbine.flow_coefficients}')
+        print(f'{name} tip mach nos: {turbine.tip_mach_nos}')
+        print(f'{name} pressure ratios: {turbine.pressure_ratios}')
+        print(f'{name} pressure ratio: {turbine.pressure_ratio}')
+        print('****')
+    print(
+        f'turbine presure ratio: {np.prod(engine.hpt.pressure_ratios) * np.prod(engine.lpt.pressure_ratios)}')
 
     plots.draw_engine(engine)
 

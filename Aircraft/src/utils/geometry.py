@@ -9,6 +9,10 @@ def get_area_from_diameter(diameter):
     return np.pi * (diameter / 2)**2
 
 
+def get_tangential_speed(angular_velocity, diameter):
+    return angular_velocity * diameter / 2
+
+
 def get_angular_velocity(tangential_speed, diameter):
     return 2 * tangential_speed / diameter
 

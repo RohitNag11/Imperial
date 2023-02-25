@@ -15,23 +15,16 @@ def draw_engine(engine):
              engine.fan.inner_fan_tip_diameter, engine.fan.hub_diameter, 0, 'Fan')
     draw_fan(ax, -engine.fan.tip_diameter,
              -engine.fan.inner_fan_tip_diameter, -engine.fan.hub_diameter, 0)
-    draw_turb_comp(ax, engine.lpc.hub_diameters,
-                   engine.lpc.tip_diameters, 5, 'LPC')
-    draw_turb_comp(ax, -engine.lpc.hub_diameters,
-                   -engine.lpc.tip_diameters, 5)
-    draw_turb_comp(ax, engine.hpc.hub_diameters,
-                   engine.hpc.tip_diameters, 11+engine.lpc.no_of_stages, 'HPC')
-    draw_turb_comp(ax, -engine.hpc.hub_diameters,
-                   -engine.hpc.tip_diameters, 11+engine.lpc.no_of_stages)
-    draw_turb_comp(ax, engine.hpt.hub_diameters,
-                   engine.hpt.tip_diameters, 17+engine.hpt.no_of_stages, 'HPT')
-    draw_turb_comp(ax, -engine.hpt.hub_diameters,
-                   -engine.hpt.tip_diameters, 11+engine.hpt.no_of_stages)
-    draw_turb_comp(ax, engine.lpt.hub_diameters,
-                   engine.lpt.tip_diameters, 11+engine.lpt.no_of_stages, 'LPT')
-    draw_turb_comp(ax, -engine.lpt.hub_diameters,
-                   -engine.lpt.tip_diameters, 11+engine.lpt.no_of_stages)
-
+    component_gap = 5
+    start_pos = 6
+    turb_components = [engine.lpc, engine.hpc, engine.hpt, engine.lpt]
+    names = ['LPC', 'HPC', 'HPT', 'LPT']
+    for i, turb_comp in enumerate(turb_components):
+        draw_turb_comp(ax, turb_comp.hub_diameters,
+                       turb_comp.tip_diameters, start_pos, names[i])
+        draw_turb_comp(ax, -turb_comp.hub_diameters,
+                       -turb_comp.tip_diameters, start_pos)
+        start_pos += 2 * turb_comp.no_of_stages + component_gap
     plt.show()
 
 

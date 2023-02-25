@@ -14,7 +14,7 @@ class Turbine(TurboComponent):
                  T0_exit,
                  T0_inlet,
                  angular_velocity,
-                 per_stage_pressure_ratio=1.3,
+                 isentropic_efficiency=0.92,
                  work_coefficient=2.2,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
@@ -43,28 +43,17 @@ class Turbine(TurboComponent):
             self.T0_inlet - self.T0_exit) / (self.no_of_stages-1)
         self.stag_temps = np.linspace(self.T0_inlet,
                                       self.T0_exit, self.no_of_stages + 1)
-        isentropic_efficiency = 0.85
+        self.isentropic_efficiency = isentropic_efficiency
         self.pressure_ratios = 1 / (1 - self.d_stag_temp_per_stage/(isentropic_efficiency * 0.5 * (
             self.stag_temps[1:] + self.stag_temps[:-1])))**(SPEC_HEAT_RATIO / (SPEC_HEAT_RATIO - 1))
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
-
-        # self.area_exit = 1
-        # self.area_inlet = 1
+        self.pressure_ratio = np.prod(self.pressure_ratios)
+        self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
+        self.mean_tangential_speeds = geom.get_tangential_speed(
+            self.angular_velocity, self.tip_diameters)
+        self.flow_coefficients = self.axial_velocity / self.mean_tangential_speeds
 
     def __get_no_of_stages(self):
-
-        # r_h = self.hub_diameter / 2
-        # a = (r_h**2 + self.area_exit / np.pi)**0.5
-        # b = (r_h**2 + self.area_inlet / np.pi)**0.5
-        # # NOTE: c is very large, causes n_stages to converge to 1
-        # c = self.work_coefficient * self.angular_velocity**2 / 4
-        # d = a - b
-        # e = r_h + b
-        # f = 2 * (r_h+b)*(a-b)
-        # g = (c*d**2)/3 + (c*e**2) + f
-        # h = (c*d**2)/6 + (c*e**2) + f
-        # n_stages = (h + (h**2 + 4 * g * self.d_stag_enthalpy)**0.5) / (2 * g)
-
         n_stages = self.d_stag_enthalpy / (self.work_coefficient * (
             self.area_inlet * self.angular_velocity / (2 * np.pi * self.blade_length))**2)
         return n_stages
@@ -84,3 +73,15 @@ class Turbine(TurboComponent):
         areas = geom.get_annulus_area(hub_tip_ratios, self.mean_radius)
         blade_lengths = (tip_diameters - hub_diameters) / 2
         return hub_diameters, tip_diameters, hub_tip_ratios, areas, blade_lengths
+
+    def __get_tip_mach_nos(self, SPEC_HEAT_RATIO, GAS_CONST):
+        u_tips = geom.get_tangential_speed(
+            self.angular_velocity, self.tip_diameters)
+        stag_temps = np.linspace(self.T0_inlet,
+                                 self.T0_exit, self.no_of_stages)
+        static_temps = thermo.get_static_temp(
+            stag_temps, self.axial_velocity, SPEC_HEAT_RATIO, GAS_CONST)
+        speed_of_sounds = thermo.get_speed_of_sound(
+            static_temps, SPEC_HEAT_RATIO, GAS_CONST)
+        tip_mach_nos = u_tips / speed_of_sounds
+        return tip_mach_nos
