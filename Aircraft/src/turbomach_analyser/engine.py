@@ -75,7 +75,7 @@ class Engine:
                               per_stage_pressure_ratio=per_stage_pressure_ratio,
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST)
-        self.hpt = Turbine(is_low_pressure=True,
+        self.hpt = Turbine(is_low_pressure=False,
                            mass_flow=self.mass_flow,
                            axial_velocity=turbine_axial_velocity,
                            pressure_ratio=P_044/P_041,

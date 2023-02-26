@@ -170,8 +170,8 @@
         "density_inlet": 2.909878326381018,
         "area_exit": 0.12395323013575682,
         "area_inlet": 0.046966454036116836,
-        "is_low_pressure": true,
-        "name": "LPT",
+        "is_low_pressure": false,
+        "name": "HPT",
         "blade_length": 0.012,
         "mean_radius": 0.6229119432788578,
         "d_stag_enthalpy": 411024.9,
@@ -179,12 +179,6 @@
         "angular_velocity": 600,
         "no_of_stages": 3,
         "d_stag_temp_per_stage": 204.49,
-        "stag_temps": [
-            1677.7,
-            1541.3733333333334,
-            1405.0466666666666,
-            1268.72
-        ],
         "isentropic_efficiency": 0.92,
         "pressure_ratios": [
             1.68226782294127,
@@ -221,16 +215,8 @@
             0.4961848544924596,
             0.5391600197809355
         ],
-        "mean_tangential_speeds": [
-            377.34716596731465,
-            380.29770161713805,
-            383.2482372669614
-        ],
-        "flow_coefficients": [
-            0.39751192940718366,
-            0.3944278373551976,
-            0.39139123266342296
-        ]
+        "mean_tangential_speed": 186.87358298365734,
+        "flow_coefficient": 0.8026816717755015
     },
     "lpt": {
         "_TurboComponent__SPEC_HEAT_RATIO": 1.4,
@@ -259,13 +245,6 @@
         "angular_velocity": 294.67609760548953,
         "no_of_stages": 4,
         "d_stag_temp_per_stage": 125.27000000000002,
-        "stag_temps": [
-            1268.72,
-            1174.7675,
-            1080.815,
-            986.8625,
-            892.91
-        ],
         "isentropic_efficiency": 0.92,
         "pressure_ratios": [
             1.5122132333993978,
@@ -309,17 +288,7 @@
             0.3291841383219379,
             0.35787213800069595
         ],
-        "mean_tangential_speeds": [
-            202.15181892713645,
-            205.77053298594117,
-            209.3892470447459,
-            213.00796110355063
-        ],
-        "flow_coefficients": [
-            0.7420165734648471,
-            0.7289673493252234,
-            0.7163691646875516,
-            0.7041990319182472
-        ]
+        "mean_tangential_speed": 98.86583873152706,
+        "flow_coefficient": 1.5172075807431238
     }
 }

@@ -32,6 +32,7 @@ class Compressor(TurboComponent):
         self.mean_radius = geom.get_mean_radius_from_blade_length(
             kwargs['final_blade_length'], self.area_exit) if 'final_blade_length' in kwargs else kwargs['mean_radius']
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
+        self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
 
     def __str__(self):
         properties = {f'{self.name} tip diameter: {self.tip_diameters}',

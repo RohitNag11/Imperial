@@ -40,17 +40,14 @@ class Turbine(TurboComponent):
         self.no_of_stages = int(np.ceil(self.__get_no_of_stages()))
         self.d_stag_temp_per_stage = (
             self.T0_inlet - self.T0_exit) / (self.no_of_stages-1)
-        self.stag_temps = np.linspace(self.T0_inlet,
-                                      self.T0_exit, self.no_of_stages + 1)
         self.isentropic_efficiency = isentropic_efficiency
-        self.pressure_ratios = 1 / (1 - self.d_stag_temp_per_stage/(isentropic_efficiency * 0.5 * (
-            self.stag_temps[1:] + self.stag_temps[:-1])))**(SPEC_HEAT_RATIO / (SPEC_HEAT_RATIO - 1))
+        self.pressure_ratios = self.__get_pressure_ratios(SPEC_HEAT_RATIO)
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
         self.pressure_ratio = np.prod(self.pressure_ratios)
         self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
-        self.mean_tangential_speeds = geom.get_tangential_speed(
-            self.angular_velocity, self.tip_diameters)
-        self.flow_coefficients = self.axial_velocity / self.mean_tangential_speeds
+        self.mean_tangential_speed = geom.get_tangential_speed(
+            self.angular_velocity, self.mean_radius)
+        self.flow_coefficient = self.axial_velocity / self.mean_tangential_speed
 
     def __str__(self):
         properties = {f'{self.name} no of stages: {self.no_of_stages}',
@@ -59,7 +56,7 @@ class Turbine(TurboComponent):
                       f'{self.name} exit area: {self.area_exit}',
                       f'{self.name} angular velocity: {self.angular_velocity}',
                       f'{self.name} mean radius: {self.mean_radius}',
-                      f'{self.name} flow coefficients: {self.flow_coefficients}',
+                      f'{self.name} flow coefficient: {self.flow_coefficient}',
                       f'{self.name} tip mach nos: {self.tip_mach_nos}',
                       f'{self.name} pressure ratios: {self.pressure_ratios}',
                       f'{self.name} pressure ratio: {self.pressure_ratio}'}
@@ -85,6 +82,14 @@ class Turbine(TurboComponent):
         areas = geom.get_annulus_area(hub_tip_ratios, self.mean_radius)
         blade_lengths = (tip_diameters - hub_diameters) / 2
         return hub_diameters, tip_diameters, hub_tip_ratios, areas, blade_lengths
+
+    def __get_pressure_ratios(self, SPEC_HEAT_RATIO):
+        stag_temps = np.linspace(self.T0_inlet,
+                                 self.T0_exit,
+                                 self.no_of_stages + 1)
+        pressure_ratios = 1 / (1 - self.d_stag_temp_per_stage/(self.isentropic_efficiency * 0.5 * (
+            stag_temps[1:] + stag_temps[:-1])))**(SPEC_HEAT_RATIO / (SPEC_HEAT_RATIO - 1))
+        return pressure_ratios
 
     def __get_tip_mach_nos(self, SPEC_HEAT_RATIO, GAS_CONST):
         u_tips = geom.get_tangential_speed(
