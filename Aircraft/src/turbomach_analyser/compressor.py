@@ -1,5 +1,7 @@
-from .turbo_component import TurboComponent
-from ..utils import geometry as geom
+from .turbo_component import (TurboComponent)
+from .stage import Stage
+from ..utils import (geometry as geom,
+                     thermo)
 import numpy as np
 
 
@@ -12,10 +14,12 @@ class Compressor(TurboComponent):
                  P0_exit,
                  T0_exit,
                  T0_inlet,
+                 angular_velocity,
                  per_stage_pressure_ratio=1.3,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
-                 **kwargs):
+                 SPEC_HEAT_CAPACITY=1005,
+                 ** kwargs):
         super().__init__(mass_flow,
                          axial_velocity,
                          pressure_ratio,
@@ -31,8 +35,20 @@ class Compressor(TurboComponent):
             np.log(self.pressure_ratio) / np.log(per_stage_pressure_ratio)))
         self.mean_radius = geom.get_mean_radius_from_blade_length(
             kwargs['final_blade_length'], self.area_exit) if 'final_blade_length' in kwargs else kwargs['mean_radius']
+        self.angular_velocity = angular_velocity
+        self.tangential_speed = geom.get_tangential_speed(
+            angular_velocity, self.mean_radius * 2)
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
-        self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
+        # self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
+        self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
+        self.flow_coeff = self.axial_velocity / self.tangential_speed
+        self.stages = [Stage(flow_coeff=self.flow_coeff,
+                             work_coeff=self.work_coeff,
+                             axial_velocity=self.axial_velocity,
+                             angular_velocity=self.angular_velocity,
+                             hub_diameter=self.hub_diameters[i],
+                             tip_diameter=self.tip_diameters[i],
+                             reaction_init=0.5) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} tip diameter: {self.tip_diameters}',
@@ -58,3 +74,6 @@ class Compressor(TurboComponent):
         areas = geom.get_annulus_area(hub_tip_ratios, self.mean_radius)
         blade_lengths = (tip_diameters - hub_diameters) / 2
         return hub_diameters, tip_diameters, hub_tip_ratios, areas, blade_lengths
+
+    def __get_work_coefficient(self, SPEC_HEAT_CAPACITY):
+        return thermo.get_delta_stag_enthalpy(self.T0_exit - self.T0_inlet, SPEC_HEAT_CAPACITY) / (self.no_of_stages * self.tangential_speed ** 2)

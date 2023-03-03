@@ -29,8 +29,8 @@ def get_engine_constants():
         'lpc_pressure_ratio': 2.5,
         'per_stage_pressure_ratio': 1.3,
         'lpt_work_coefficient': 2.5,
-        'hpt_work_coefficient': 1.0,
-        'hpt_angular_velocity': 600,
+        'hpt_work_coefficient': 0.8,
+        'hpt_angular_velocity': 1250,
         'min_blade_length': 0.012,
         'lpt_min_blade_length': 0.03,
         'P_025': 91802,
@@ -47,9 +47,7 @@ def get_engine_constants():
 
 
 def main():
-    consts = get_constants()
-    engine_consts = get_engine_constants()
-    engine = Engine(**engine_consts, **consts)
+    engine = Engine(**get_constants(), **get_engine_constants())
     components = [engine.fan, engine.lpc, engine.hpc, engine.hpt, engine.lpt]
     [print(f'{component}\n*****\n') for component in components]
     formatter.save_obj_to_file(engine, 'Aircraft/engine_design.json')
