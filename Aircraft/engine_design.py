@@ -43,6 +43,8 @@ def get_engine_constants():
         'T_045': 1268.72,
         'P_05': 82688,
         'T_05': 892.91,
+        'compressor_reaction': 0.5,
+        'turbine_reaction': 0.5,
     }
 
 

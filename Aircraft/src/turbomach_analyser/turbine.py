@@ -1,6 +1,7 @@
 from .turbo_component import TurboComponent
 from ..utils import (geometry as geom,
                      thermo)
+from .stage import Stage
 import numpy as np
 
 
@@ -16,6 +17,7 @@ class Turbine(TurboComponent):
                  angular_velocity,
                  isentropic_efficiency=0.92,
                  work_coefficient=2.2,
+                 reaction=0.5,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
@@ -35,7 +37,7 @@ class Turbine(TurboComponent):
             kwargs['min_blade_length'], self.area_inlet) if 'min_blade_length' in kwargs else kwargs['mean_radius']
         self.d_stag_enthalpy = thermo.get_delta_stag_enthalpy(
             T0_inlet - T0_exit, SPEC_HEAT_CAPACITY)
-        self.work_coefficient = work_coefficient
+        self.work_coeff = work_coefficient
         self.angular_velocity = angular_velocity
         self.no_of_stages = int(np.ceil(self.__get_no_of_stages()))
         self.d_stag_temp_per_stage = (
@@ -47,7 +49,15 @@ class Turbine(TurboComponent):
         self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
         self.mean_tangential_speed = geom.get_tangential_speed(
             self.angular_velocity, self.mean_radius)
-        self.flow_coefficient = self.axial_velocity / self.mean_tangential_speed
+        self.flow_coeff = self.axial_velocity / self.mean_tangential_speed
+        self.stages = [Stage(is_compressor_stage=False,
+                             flow_coeff=self.flow_coeff,
+                             work_coeff=self.work_coeff,
+                             axial_velocity=self.axial_velocity,
+                             angular_velocity=self.angular_velocity,
+                             hub_diameter=self.hub_diameters[i],
+                             tip_diameter=self.tip_diameters[i],
+                             reaction_init=reaction) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} no of stages: {self.no_of_stages}',
@@ -56,14 +66,14 @@ class Turbine(TurboComponent):
                       f'{self.name} exit area: {self.area_exit}',
                       f'{self.name} angular velocity: {self.angular_velocity}',
                       f'{self.name} mean radius: {self.mean_radius}',
-                      f'{self.name} flow coefficient: {self.flow_coefficient}',
+                      f'{self.name} flow coefficient: {self.flow_coeff}',
                       f'{self.name} tip mach nos: {self.tip_mach_nos}',
                       f'{self.name} pressure ratios: {self.pressure_ratios}',
                       f'{self.name} pressure ratio: {self.pressure_ratio}'}
         return self.name + super().__str__() + ':' + '\n' + '\n'.join(properties)
 
     def __get_no_of_stages(self):
-        n_stages = self.d_stag_enthalpy / (self.work_coefficient * (
+        n_stages = self.d_stag_enthalpy / (self.work_coeff * (
             self.area_inlet * self.angular_velocity / (2 * np.pi * self.blade_length))**2)
         return n_stages
 

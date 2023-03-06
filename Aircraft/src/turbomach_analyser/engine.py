@@ -36,6 +36,8 @@ class Engine:
                  T_05=892.91,
                  min_blade_length=0.01,
                  lpt_min_blade_length=0.012,
+                 compressor_reaction=0.5,
+                 turbine_reaction=0.5,
                  GAS_CONST=1.4,
                  SPEC_HEAT_RATIO=287,
                  TEMP_SEA=288.15,
@@ -64,6 +66,7 @@ class Engine:
                            isentropic_efficiency=turbine_isentropic_efficiency,
                            work_coefficient=hpt_work_coefficient,
                            min_blade_length=0.02,
+                           reaction=turbine_reaction,
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -78,6 +81,7 @@ class Engine:
                            isentropic_efficiency=turbine_isentropic_efficiency,
                            work_coefficient=lpt_work_coefficient,
                            min_blade_length=lpt_min_blade_length,
+                           reaction=turbine_reaction,
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -91,6 +95,7 @@ class Engine:
                               angular_velocity=self.fan.angular_velocity,
                               mean_radius=self.fan.inner_fan_mean_radius,
                               per_stage_pressure_ratio=per_stage_pressure_ratio,
+                              reaction=compressor_reaction,
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -104,6 +109,7 @@ class Engine:
                               angular_velocity=hpt_angular_velocity,
                               final_blade_length=min_blade_length,
                               per_stage_pressure_ratio=per_stage_pressure_ratio,
+                              reaction=compressor_reaction,
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
