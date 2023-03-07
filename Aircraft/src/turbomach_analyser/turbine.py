@@ -17,7 +17,9 @@ class Turbine(TurboComponent):
                  angular_velocity,
                  isentropic_efficiency=0.92,
                  work_coefficient=2.2,
-                 reaction=0.5,
+                 reaction_mean=0.5,
+                 reaction_tip=0.5,
+                 reaction_hub=0.5,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
@@ -51,13 +53,16 @@ class Turbine(TurboComponent):
             self.angular_velocity, self.mean_radius)
         self.flow_coeff = self.axial_velocity / self.mean_tangential_speed
         self.stages = [Stage(is_compressor_stage=False,
+                             number=i + 1,
                              flow_coeff=self.flow_coeff,
                              work_coeff=self.work_coeff,
                              axial_velocity=self.axial_velocity,
                              angular_velocity=self.angular_velocity,
                              hub_diameter=self.hub_diameters[i],
                              tip_diameter=self.tip_diameters[i],
-                             reaction_init=reaction) for i in range(self.no_of_stages)]
+                             reaction_mean=reaction_mean,
+                             reaction_hub=reaction_hub,
+                             reaction_tip=reaction_tip) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} no of stages: {self.no_of_stages}',

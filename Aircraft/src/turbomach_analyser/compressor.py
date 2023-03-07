@@ -16,7 +16,9 @@ class Compressor(TurboComponent):
                  T0_inlet,
                  angular_velocity,
                  per_stage_pressure_ratio=1.3,
-                 reaction=0.5,
+                 reaction_mean=0.5,
+                 reaction_tip=0.5,
+                 reaction_hub=0.5,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
@@ -44,13 +46,16 @@ class Compressor(TurboComponent):
         self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
         self.flow_coeff = self.axial_velocity / self.tangential_speed
         self.stages = [Stage(is_compressor_stage=True,
+                             number=i + 1,
                              flow_coeff=self.flow_coeff,
                              work_coeff=self.work_coeff,
                              axial_velocity=self.axial_velocity,
                              angular_velocity=self.angular_velocity,
                              hub_diameter=self.hub_diameters[i],
                              tip_diameter=self.tip_diameters[i],
-                             reaction_init=reaction) for i in range(self.no_of_stages)]
+                             reaction_mean=reaction_mean,
+                             reaction_hub=reaction_hub,
+                             reaction_tip=reaction_tip) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} tip diameter: {self.tip_diameters}',
