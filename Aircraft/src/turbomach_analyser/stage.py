@@ -35,13 +35,13 @@ class Stage:
         self.mean_tangential_speed = geom.get_tangential_speed(
             angular_velocity, self.mean_radius * 2)
         self.d_stag_enthalpy = work_coeff * self.mean_tangential_speed**2
-        self.blade_angles = {}
+        self.blade_angles_rad = {}
         # NOTE: consider setting first and last stage inlet/exit angles to 0
-        self.blade_angles['mean'] = self.get_mean_blade_angles()
-        self.blade_angles['hub'] = self.get_blade_angles_at_radius(radius=hub_diameter / 2,
-                                                                   reaction=reaction_hub)
-        self.blade_angles['tip'] = self.get_blade_angles_at_radius(radius=tip_diameter / 2,
-                                                                   reaction=reaction_tip)
+        self.blade_angles_rad['mean'] = self.get_mean_blade_angles()
+        self.blade_angles_rad['hub'] = self.get_blade_angles_at_radius(radius=hub_diameter / 2,
+                                                                       reaction=reaction_hub)
+        self.blade_angles_rad['tip'] = self.get_blade_angles_at_radius(radius=tip_diameter / 2,
+                                                                       reaction=reaction_tip)
 
         # self.mean_blade_angles = self.get_mean_blade_angles()
         # self.hub_blade_angles = self.get_blade_angles_at_radius(radius=hub_diameter / 2,
@@ -52,6 +52,13 @@ class Stage:
         #                                                         label='tip')
         self.work_coeff['hub'] = self.get_work_coeff_at_location('hub')
         self.work_coeff['tip'] = self.get_work_coeff_at_location('tip')
+        self.blade_angles_deg = {}
+        self.blade_angles_deg['mean'] = {key: np.rad2deg(
+            val) for key, val in self.blade_angles_rad['mean'].items()}
+        self.blade_angles_deg['hub'] = {key: np.rad2deg(
+            val) for key, val in self.blade_angles_rad['hub'].items()}
+        self.blade_angles_deg['tip'] = {key: np.rad2deg(
+            val) for key, val in self.blade_angles_rad['tip'].items()}
 
     def get_mean_blade_angles(self):
         reaction = self.reaction['mean']
@@ -76,7 +83,7 @@ class Stage:
         }
 
     def get_blade_angles_at_radius(self, radius, reaction):
-        alpha_2_mean = self.blade_angles['mean']['alpha_2']
+        alpha_2_mean = self.blade_angles_rad['mean']['alpha_2']
         alpha_2_r = np.arctan(np.tan(alpha_2_mean) *
                               (radius / self.mean_radius))
         alpha_3_r = np.arctan(
@@ -87,6 +94,6 @@ class Stage:
         }
 
     def get_work_coeff_at_location(self, location):
-        alpha_3_r = self.blade_angles[location]['alpha_3']
-        alpha_2_r = self.blade_angles[location]['alpha_2']
+        alpha_3_r = self.blade_angles_rad[location]['alpha_3']
+        alpha_2_r = self.blade_angles_rad[location]['alpha_2']
         return self.flow_coeff * (np.tan(alpha_3_r) - np.tan(alpha_2_r))
