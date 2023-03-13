@@ -19,6 +19,7 @@ class Compressor(TurboComponent):
                  reaction_mean=0.5,
                  reaction_tip=0.5,
                  reaction_hub=0.5,
+                 diffusion_factor=0.45,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
@@ -43,8 +44,12 @@ class Compressor(TurboComponent):
             angular_velocity, self.mean_radius * 2)
         self.hub_diameters, self.tip_diameters, self.hub_tip_ratios, self.areas, self.blade_lengths = self.__get_geometry_of_stages()
         # self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
-        self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
+        self.d_stag_enthalpy = thermo.get_delta_stag_enthalpy(
+            self.T0_exit - self.T0_inlet, SPEC_HEAT_CAPACITY)
+        # self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
         self.flow_coeff = self.axial_velocity / self.tangential_speed
+        # NOTE: FIX WORK COEFF
+        self.work_coeff = 0.5
         self.stages = [Stage(is_compressor_stage=True,
                              number=i + 1,
                              flow_coeff=self.flow_coeff,
@@ -55,7 +60,8 @@ class Compressor(TurboComponent):
                              tip_diameter=self.tip_diameters[i],
                              reaction_mean=reaction_mean,
                              reaction_hub=reaction_hub,
-                             reaction_tip=reaction_tip) for i in range(self.no_of_stages)]
+                             reaction_tip=reaction_tip,
+                             diffusion_factor=diffusion_factor) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} tip diameter: {self.tip_diameters}',
@@ -83,4 +89,4 @@ class Compressor(TurboComponent):
         return hub_diameters, tip_diameters, hub_tip_ratios, areas, blade_lengths
 
     def __get_work_coefficient(self, SPEC_HEAT_CAPACITY):
-        return thermo.get_delta_stag_enthalpy(self.T0_exit - self.T0_inlet, SPEC_HEAT_CAPACITY) / (self.no_of_stages * self.tangential_speed ** 2)
+        return self.d_stag_enthalpy / (self.no_of_stages * self.tangential_speed ** 2)

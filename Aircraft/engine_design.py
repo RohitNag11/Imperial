@@ -46,9 +46,11 @@ def get_engine_constants():
         'compressor_reaction_mean': 0.5,
         'compressor_reaction_tip': 0.5,
         'compressor_reaction_hub': 0.5,
+        'compressor_diffusion_factor': 0.45,
         'turbine_reaction_mean': 0.5,
         'turbine_reaction_tip': 0.5,
         'turbine_reaction_hub': 0.5,
+        'turbine_lift_coeff': 0.8
     }
 
 

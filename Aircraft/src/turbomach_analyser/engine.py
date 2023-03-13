@@ -39,9 +39,11 @@ class Engine:
                  compressor_reaction_mean=0.5,
                  compressor_reaction_tip=0.5,
                  compressor_reaction_hub=0.5,
+                 compressor_diffusion_factor=0.45,
                  turbine_reaction_mean=0.5,
                  turbine_reaction_tip=0.5,
                  turbine_reaction_hub=0.5,
+                 turbine_lift_coeff=0.8,
                  GAS_CONST=1.4,
                  SPEC_HEAT_RATIO=287,
                  TEMP_SEA=288.15,
@@ -73,6 +75,7 @@ class Engine:
                            reaction_mean=turbine_reaction_mean,
                            reaction_tip=turbine_reaction_tip,
                            reaction_hub=turbine_reaction_hub,
+                           lift_coeff=turbine_lift_coeff,
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -90,6 +93,7 @@ class Engine:
                            reaction_mean=turbine_reaction_mean,
                            reaction_tip=turbine_reaction_tip,
                            reaction_hub=turbine_reaction_hub,
+                           lift_coeff=turbine_lift_coeff,
                            SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                            GAS_CONST=GAS_CONST,
                            SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -106,6 +110,7 @@ class Engine:
                               reaction_mean=compressor_reaction_mean,
                               reaction_tip=compressor_reaction_tip,
                               reaction_hub=compressor_reaction_hub,
+                              diffusion_factor=compressor_diffusion_factor,
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
@@ -122,6 +127,7 @@ class Engine:
                               reaction_mean=compressor_reaction_mean,
                               reaction_tip=compressor_reaction_tip,
                               reaction_hub=compressor_reaction_hub,
+                              diffusion_factor=compressor_diffusion_factor,
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)

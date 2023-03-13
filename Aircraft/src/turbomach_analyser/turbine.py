@@ -20,6 +20,7 @@ class Turbine(TurboComponent):
                  reaction_mean=0.5,
                  reaction_tip=0.5,
                  reaction_hub=0.5,
+                 lift_coeff=0.8,
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
@@ -62,7 +63,8 @@ class Turbine(TurboComponent):
                              tip_diameter=self.tip_diameters[i],
                              reaction_mean=reaction_mean,
                              reaction_hub=reaction_hub,
-                             reaction_tip=reaction_tip) for i in range(self.no_of_stages)]
+                             reaction_tip=reaction_tip,
+                             lift_coeff=lift_coeff) for i in range(self.no_of_stages)]
 
     def __str__(self):
         properties = {f'{self.name} no of stages: {self.no_of_stages}',

@@ -109,17 +109,22 @@ class CourseWork:
         poly = PolynomialFeatures(degree=degree, include_bias=True)
         return poly.fit_transform(x.reshape(-1, 1))
 
+    def __fit_n_degree_regression_to_data(self, x, y, degree):
+        x_poly = self.__get_x_poly(x, degree)
+        model = LinearRegression()
+        model.fit(x_poly, y)
+        score = model.score(x_poly, y)
+        beta = model.coef_
+        beta[0] = model.intercept_
+        return beta, score
+
     def fit_n_degree_regression(self,
                                 degree: int,
                                 standardise: bool,
                                 filter: bool):
         x, y = self.__get_data(standardise, filter)
-        x_poly = self.__get_x_poly(x, degree)
-        model = LinearRegression()
-        model.fit(x_poly, y)
-        beta = model.coef_
-        beta[0] = model.intercept_
-        return beta, model.score(x_poly, y)
+        beta, score = self.__fit_n_degree_regression_to_data(x, y, degree)
+        return beta, score
 
     def plot_n_degree_regression(self,
                                  degree: int,
@@ -172,7 +177,9 @@ class CourseWork:
         x, y = self.__get_data(standardise, filter)
         error = self.get_residuals(degree, standardise, filter)
         mean_error = np.mean(error)
-        fig, ax = plt.subplots(1, 2, sharey=True)
+        fig, ax = plt.subplots(1, 3, sharey=True, gridspec_kw={
+                               'width_ratios': [1, 1, 1]})
+        # Plot the scatter plot of errors on the first subplot
         ax[0].scatter(x, error, s=1, label='Residuals')
         ax[0].axhline(mean_error, c='r', ls='--', label='Mean Error')
         self.__config_plot(ax[0],
@@ -180,13 +187,22 @@ class CourseWork:
                            y_label='Error (nm)',
                            title='(a)',
                            legend=True)
+        # Plot the horizontal histogram of errors on the second subplot
         ax[1].hist(error, bins=10, fc='lightblue',
                    ec='k', orientation='horizontal')
         ax[1].axhline(mean_error, c='r', ls='--', label='Mean Error')
         self.__config_plot(ax[1],
                            x_label='Frequency',
+                           y_label='Error (nm)',
                            title='(b)',
-                           legend=True)
+                           legend=False)
+        # Plot the QQ plot of errors on the third subplot
+        stats.probplot(error, rvalue=True, plot=ax[2])
+        self.__config_plot(ax[2],
+                           x_label='Theoretical Quantiles',
+                           y_label='Sample Quantiles',
+                           title='(c)')
+        # plt.subplots_adjust(wspace=0.3)
         plt.show()
 
     def __log_likehood(self, degree: int, standardise: bool, filter: bool):
@@ -194,10 +210,11 @@ class CourseWork:
         error = self.get_residuals(degree, standardise, filter)
         n = len(error)
         squared_error = np.matmul(error.T, error)
-        variance = np.std(error)**2
-        # variance = np.std(y)**2
-        exponent = (-1 / (2 * variance)) * squared_error
-        log_likehood = -0.5 * n * np.log(2 * np.pi * variance) + exponent
+        sigma_hat_squared = np.std(error)**2
+        # sigma_hat_squared = sum(error**2) / n
+        exponent = (-1 / (2 * sigma_hat_squared)) * squared_error
+        log_likehood = -0.5 * n * \
+            np.log(2 * np.pi * sigma_hat_squared) + exponent
         return log_likehood
 
     def get_aic(self, degree: int, standardise: bool, filter: bool):
@@ -205,6 +222,133 @@ class CourseWork:
         q = degree + 2
         aic = 2 * q - 2 * log_likehood
         return aic
+
+    def __get__bootstrapped_error(self, degree: int, standardise: bool, filter: bool):
+        error = self.get_residuals(degree, standardise, filter)
+        return np.random.choice(error,
+                                size=len(error),
+                                replace=True)
+
+    def __get_response_from_bootstrapped_error(self,
+                                               degree: int,
+                                               standardise: bool,
+                                               filter: bool):
+        x, y = self.__get_data(standardise, filter)
+        x_poly = self.__get_x_poly(x, degree)
+        beta, score = self.fit_n_degree_regression(degree,
+                                                   standardise,
+                                                   filter)
+        error = self.__get__bootstrapped_error(degree,
+                                               standardise,
+                                               filter)
+        return np.dot(x_poly, beta) + error
+
+    def __fit_n_degree_regression_to_bootstrapped_response(self,
+                                                           degree: int,
+                                                           standardise: bool,
+                                                           filter: bool):
+        x, y = self.__get_data(standardise, filter)
+        x_poly = self.__get_x_poly(x, degree)
+        y_bootstrapped = self.__get_response_from_bootstrapped_error(
+            degree, standardise, filter)
+        beta, score = self.__fit_n_degree_regression_to_data(
+            x, y_bootstrapped, degree)
+        y_bootstrapped_fit = np.dot(x_poly, beta)
+        return y_bootstrapped_fit
+
+    def get_response_confidence_band(self,
+                                     repeat: int,
+                                     confidence_interval: float,
+                                     degree: int,
+                                     standardise: bool,
+                                     filter: bool):
+        def __get_confidence_band(array):
+            lower = np.percentile(array, (100 - confidence_interval) / 2)
+            upper = np.percentile(array, (100 + confidence_interval) / 2)
+            return lower, upper
+        Y = np.array([self.__fit_n_degree_regression_to_bootstrapped_response(
+            degree, standardise, filter) for _ in range(repeat)])
+        confidence_band = np.apply_along_axis(__get_confidence_band,
+                                              axis=0,
+                                              arr=Y)
+        return confidence_band
+
+    def __create_confidence_band_on_plot(self,
+                                         ax,
+                                         repeat: int,
+                                         confidence_interval: float,
+                                         degree: int,
+                                         standardise: bool,
+                                         filter: bool):
+        x, y = self.__get_data(standardise, filter)
+        confidence_band = self.get_response_confidence_band(
+            repeat, confidence_interval, degree, standardise, filter)
+        ax.fill_between(x,
+                        confidence_band[0],
+                        confidence_band[1],
+                        alpha=0.1,
+                        label=f'{confidence_interval}% Confidence Band for {repeat} Bootstrap Samples')
+        # ax.plot(x, confidence_band[0], c='r', ls='--', lw=1)
+        # ax.plot(x, confidence_band[1], c='r', ls='--', lw=1)
+        return ax
+
+    def plot_confidence_band(self,
+                             repeat: int,
+                             confidence_interval: float,
+                             degree: int,
+                             standardise: bool,
+                             filter: bool):
+        x, y = self.__get_data(standardise, filter)
+        x_fit = np.linspace(np.min(x), np.max(x), 100)
+        x_fit_poly = self.__get_x_poly(x_fit, degree)
+        y_fit_original = np.dot(x_fit_poly,
+                                self.fit_n_degree_regression(degree,
+                                                             standardise,
+                                                             filter)[0])
+        x_label = f'Standardised {self.x_label}' \
+            if standardise else self.x_label
+        ax = self.__create_scatter_plot(standardise, filter)
+        self.__create_confidence_band_on_plot(ax,
+                                              repeat,
+                                              confidence_interval,
+                                              degree,
+                                              standardise,
+                                              filter)
+        ax.plot(x_fit,
+                y_fit_original,
+                c='r',
+                label=f'{self.to_ordinal(degree)} Degree Fit')
+        self.__config_plot(ax, x_label, self.y_label, legend=True)
+        plt.show()
+
+    def plot_confidence_band_error_for_dif_samples(self,
+                                                   repeat_range: tuple,
+                                                   confidence_interval: float,
+                                                   degree: int,
+                                                   standardise: bool,
+                                                   filter: bool):
+        x, y = self.__get_data(standardise, filter)
+        x_poly = self.__get_x_poly(x, degree)
+        y_fit_original = np.dot(x_poly,
+                                self.fit_n_degree_regression(degree,
+                                                             standardise,
+                                                             filter)[0])
+        bootstrap_samples = np.arange(
+            repeat_range[0], repeat_range[1] + 1, repeat_range[2])
+        conf_band_mean_squared_errors = np.zeros(bootstrap_samples.shape[0])
+        for i, repeat in enumerate(bootstrap_samples):
+            confidence_band = self.get_response_confidence_band(
+                repeat, confidence_interval, degree, standardise, filter)
+            mean_confidence_band = np.mean(confidence_band, axis=0)
+            conf_band_mean_squared_errors[i] = np.mean(
+                np.square(mean_confidence_band - y_fit_original))
+        fig, ax = plt.subplots()
+        ax.plot(bootstrap_samples, conf_band_mean_squared_errors)
+        self.__config_plot(ax,
+                           'Bootstrap Samples',
+                           'Confidence Band MSE',
+                           legend=False)
+        plt.show()
 
 
 def q1_script(cw):
@@ -221,7 +365,7 @@ def q2_script(cw):
     def __sumarise_and_plot_regression_fit(degree: int,
                                            is_standarised: bool,
                                            is_filtered: bool):
-        standarised_label = 'Standarised ' if is_standarised else 'Raw'
+        standarised_label = 'Standarised ' if is_standarised else 'Raw '
         filtered_label = 'Filtered ' if is_filtered else ''
         degree_label = cw.to_ordinal(degree) + ' Degree'
         label = f'{degree_label} Reggresion Fit on {filtered_label}{standarised_label}data'
@@ -229,7 +373,7 @@ def q2_script(cw):
                                                    is_standarised,
                                                    is_filtered)
         print(f'\n{label}:')
-        print(f'Coefficients: {coeffs}, R^2: {score:.2f}')
+        print(f'Coefficients: {coeffs}, R^2: {score}')
         cw.plot_n_degree_regression(degree, is_standarised, is_filtered)
 
     # Q2a: Fit a linear regression model to the data
@@ -237,46 +381,49 @@ def q2_script(cw):
                                        is_standarised=False,
                                        is_filtered=False)
 
-    # 2b: Fit a quadratic regression model to the data
+    # Q2b: Fit a quadratic regression model to the data
     __sumarise_and_plot_regression_fit(degree=2,
                                        is_standarised=False,
                                        is_filtered=False)
+    # Plot the linear and quadratic regression fits on the same plot
+    cw.plot_all_n_degree_regressions((1, 2),
+                                     standardise=False,
+                                     filter=False)
 
-    # 2d: Compare the Akaike Information Criterion (AIC)
+    # Q2d: Compare the Akaike Information Criterion (AIC)
     #     for different models
     # NOTE: Question 2d is answered first as
     #       it is used to determine the best model for 2c.
+    degree_range_to_test = (1, 10)
     is_standarised = True
     is_filtered = False
+    # Plot all the regression fits
+    cw.plot_all_n_degree_regressions(degree_range_to_test,
+                                     is_standarised,
+                                     is_filtered)
     aic_dict = {k: cw.get_aic(k, is_standarised, is_filtered)
-                for k in range(1, 10)}
-    d_aic_dict = {k: aic_dict[k] - aic_dict[k - 1] if k > 1 else 0
-                  for k in aic_dict}
+                for k in range(degree_range_to_test[0], degree_range_to_test[1] + 1)}
     print('\n AIC for different regression degrees:')
     print(aic_dict)
-    print('\n ΔAIC for different regression degrees:')
-    print(d_aic_dict)
 
-    # 2c: Fit the best regression model based on the AIC criterion to
-    #     the standardised data
-    # NOTE: The best model is the one with the lowest ΔAIC.
-    # Set this as the degree of the model:
-    degree_2c = min(d_aic_dict, key=d_aic_dict.get)
-    print(f'\nBest model based on AIC criterion (Lowest ΔAIC):\
+    # NOTE: The best model is the one with the lowest AIC.
+    #       Set this as the degree of the model:
+    degree_2c = min(aic_dict, key=aic_dict.get)
+    print(f'\nBest model based on AIC criterion (Lowest AIC):\
         k = {degree_2c}')
+
+    # Q2c: Fit the best regression model based on the AIC criterion to
+    #     the standardised data
     __sumarise_and_plot_regression_fit(degree_2c,
                                        is_standarised,
                                        is_filtered)
-    cw.plot_all_n_degree_regressions((1, degree_2c),
-                                     is_standarised,
-                                     is_filtered)
 
-    # 2e: Calculate residuals for model in 2c
-    #     and plot a histogram and boxplot of the residuals
+    # Q2e: Calculate residuals for model in 2c
+    #     and plot a scatter plot, histogram and QQ plot of the residuals
     residuals = cw.get_residuals(degree_2c, is_standarised, is_filtered)
     cw.plot_residuals(degree_2c, is_standarised, is_filtered)
 
-    # 2f: Extract the filtered data and fit the model in 2c
+    # Q2f: Extract the filtered data and fit the model in 2c
     #     to the filtered data
     x_flt_st, y_flt = cw.x_flt_st, cw.y_flt
     __sumarise_and_plot_regression_fit(degree_2c,
@@ -285,12 +432,35 @@ def q2_script(cw):
     return degree_2c
 
 
+def q3_script(cw, degree):
+    # Q3ai: Calculate the residuals for the model in 2f
+    residuals = cw.get_residuals(degree,
+                                 standardise=True,
+                                 filter=True)
+    # Q3aii: Plot the confidence band for the model in 2f for 1000 samples
+    bootstrap_samples = 1000
+    cw.plot_confidence_band(repeat=bootstrap_samples,
+                            confidence_interval=95,
+                            degree=degree,
+                            standardise=True,
+                            filter=True)
+    # Q3b: Show graphically the effect of increasing bootstrap samples
+    boostrap_sample_range = (100, 1000, 100)
+    cw.plot_confidence_band_error_for_dif_samples(repeat_range=boostrap_sample_range,
+                                                  confidence_interval=95,
+                                                  degree=degree,
+                                                  standardise=True,
+                                                  filter=True)
+
+
 def main(cid, path):
     cw = CourseWork(cid, path)
     # Q1:
     q1_script(cw)
     # Q2:
     degree = q2_script(cw)
+    # Q3:
+    q3_script(cw, degree)
 
 
 if '__main__' == __name__:
