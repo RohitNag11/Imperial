@@ -31,6 +31,7 @@ def get_engine_constants():
         'lpt_work_coefficient': 2.5,
         'hpt_work_coefficient': 0.8,
         'hpt_angular_velocity': 1250,
+        'hpt_min_blade_length': 0.02,
         'min_blade_length': 0.012,
         'lpt_min_blade_length': 0.03,
         'P_025': 91802,
@@ -50,7 +51,7 @@ def get_engine_constants():
         'turbine_reaction_mean': 0.5,
         'turbine_reaction_tip': 0.5,
         'turbine_reaction_hub': 0.5,
-        'turbine_lift_coeff': 0.8
+        'turbine_lift_coeff': 1
     }
 
 

@@ -88,6 +88,8 @@
             {
                 "number": 1,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 0.6421453374204014
                 },
@@ -123,13 +125,15 @@
                         "beta_3": 79.88630737098215
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.11141376434149312
+                "solidity": 0.13926720542686638,
+                "aspect_ratio": 1,
+                "no_of_blades": 234.8322701805846
             },
             {
                 "number": 2,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 0.6421453374204014
                 },
@@ -165,13 +169,15 @@
                         "beta_3": 79.88630737098215
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.11141376434149312
+                "solidity": 0.13926720542686638,
+                "aspect_ratio": 1,
+                "no_of_blades": 129.05756381509096
             },
             {
                 "number": 3,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 0.6421453374204014
                 },
@@ -207,9 +213,9 @@
                         "beta_3": 79.88630737098215
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.11141376434149312
+                "solidity": 0.13926720542686638,
+                "aspect_ratio": 1,
+                "no_of_blades": 88.97903678309845
             }
         ]
     },
@@ -289,6 +295,8 @@
             {
                 "number": 1,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 1.5172075807431238
                 },
@@ -324,13 +332,15 @@
                         "beta_3": 77.77064847414229
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.29796631618539016
+                "solidity": 0.37245789523173767,
+                "aspect_ratio": 1,
+                "no_of_blades": 281.073531400599
             },
             {
                 "number": 2,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 1.5172075807431238
                 },
@@ -366,13 +376,15 @@
                         "beta_3": 77.77064847414229
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.29796631618539016
+                "solidity": 0.37245789523173767,
+                "aspect_ratio": 1,
+                "no_of_blades": 154.54746848760965
             },
             {
                 "number": 3,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 1.5172075807431238
                 },
@@ -408,13 +420,15 @@
                         "beta_3": 77.77064847414229
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.29796631618539016
+                "solidity": 0.37245789523173767,
+                "aspect_ratio": 1,
+                "no_of_blades": 106.57322368043161
             },
             {
                 "number": 4,
                 "is_compressor_stage": false,
+                "lift_coeff": 1,
+                "diffusion_factor": null,
                 "flow_coeff": {
                     "mean": 1.5172075807431238
                 },
@@ -450,9 +464,9 @@
                         "beta_3": 77.77064847414229
                     }
                 },
-                "diffusion_factor": null,
-                "lift_coeff": 0.8,
-                "solidity": 0.29796631618539016
+                "solidity": 0.37245789523173767,
+                "aspect_ratio": 1,
+                "no_of_blades": 81.3276841303435
             }
         ]
     },
@@ -508,6 +522,8 @@
             {
                 "number": 1,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 1.1924658145401046
                 },
@@ -543,13 +559,15 @@
                         "beta_2": 22.748266744887044
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.41491606789091984
+                "solidity": 0.41491606789091984,
+                "aspect_ratio": 1,
+                "no_of_blades": 158.08689843971385
             },
             {
                 "number": 2,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 1.1924658145401046
                 },
@@ -585,9 +603,9 @@
                         "beta_2": 22.748266744887044
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.41491606789091984
+                "solidity": 0.41491606789091984,
+                "aspect_ratio": 1,
+                "no_of_blades": 179.42779624783543
             }
         ]
     },
@@ -688,6 +706,8 @@
             {
                 "number": 1,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -723,13 +743,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 31.094307007724677
             },
             {
                 "number": 2,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -765,13 +787,15 @@
                         "beta_2": 36.51742297048152
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088006
+                "solidity": 0.42270381305088006,
+                "aspect_ratio": 1,
+                "no_of_blades": 34.05015002079879
             },
             {
                 "number": 3,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -807,13 +831,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 37.626994089197034
             },
             {
                 "number": 4,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -849,13 +875,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 42.04351164163535
             },
             {
                 "number": 5,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -891,13 +919,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 47.63469630668831
             },
             {
                 "number": 6,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -933,13 +963,15 @@
                         "beta_2": 36.51742297048152
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088006
+                "solidity": 0.42270381305088006,
+                "aspect_ratio": 1,
+                "no_of_blades": 54.94107166334276
             },
             {
                 "number": 7,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -975,13 +1007,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 64.89487292788307
             },
             {
                 "number": 8,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -1017,13 +1051,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 79.25339396028912
             },
             {
                 "number": 9,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -1059,13 +1095,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 101.77107640840082
             },
             {
                 "number": 10,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -1101,13 +1139,15 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 142.16272251431053
             },
             {
                 "number": 11,
                 "is_compressor_stage": true,
+                "lift_coeff": null,
+                "diffusion_factor": 0.45,
                 "flow_coeff": {
                     "mean": 0.6752816667665127
                 },
@@ -1143,9 +1183,9 @@
                         "beta_2": 36.517422970481505
                     }
                 },
-                "diffusion_factor": 0.45,
-                "lift_coeff": null,
-                "solidity": 0.42270381305088
+                "solidity": 0.42270381305088,
+                "aspect_ratio": 1,
+                "no_of_blades": 235.71501436439792
             }
         ]
     }

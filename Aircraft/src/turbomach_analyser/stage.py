@@ -20,6 +20,8 @@ class Stage:
                  lift_coeff=None):
         self.number = number
         self.is_compressor_stage = is_compressor_stage
+        self.lift_coeff = lift_coeff if lift_coeff else None
+        self.diffusion_factor = diffusion_factor if diffusion_factor else None
         self.flow_coeff = {}
         self.flow_coeff['mean'] = flow_coeff
         self.work_coeff = {}
@@ -61,9 +63,9 @@ class Stage:
         #     val) for key, val in self.blade_angles_rad['hub'].items()}
         # self.blade_angles_deg['tip'] = {key: np.rad2deg(
         #     val) for key, val in self.blade_angles_rad['tip'].items()}
-        self.diffusion_factor = diffusion_factor if diffusion_factor else None
-        self.lift_coeff = lift_coeff if lift_coeff else None
         self.solidity = self.get_solidity()
+        self.aspect_ratio = 1
+        self.no_of_blades = self.get_no_of_blades()
 
     def get_blade_angles_at_mean_radius(self):
         # make phi and si negative if compressor.
@@ -148,3 +150,6 @@ class Stage:
             return (c1 * c2 * (t2 - t1)) / (2 * (c1 - c2 * (1 - df)))
         z = self.lift_coeff
         return np.abs(z / (2 * c2**2 * (t2 - t1)))
+
+    def get_no_of_blades(self):
+        return 2 * np.pi * self.mean_radius * self.aspect_ratio / self.blade_height
