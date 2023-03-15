@@ -2,6 +2,7 @@ import numpy as np
 from .compressor import Compressor
 from .turbine import Turbine
 from .fan import Fan
+from ..utils import (activation as act)
 
 
 class Engine:
@@ -50,7 +51,7 @@ class Engine:
                  TEMP_SEA=288.15,
                  SPEC_HEAT_CAPACITY=1005):
         self.mass_flow = mass_flow
-        self.engine_diameter = engine_diameter
+        self.diameter = engine_diameter
         self.bypass_ratio = bypass_ratio
         self.overall_pressure_ratio = overall_pressure_ratio
         self.fan = Fan(engine_diameter=engine_diameter,
@@ -133,6 +134,7 @@ class Engine:
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
         self.is_valid = self.__check_validity()
+        self.score = self.__get_score()
         return
 
     def __get_T_021(self):
@@ -142,4 +144,143 @@ class Engine:
 
     def __check_validity(self):
         # TODO
+        compressors = [self.lpc, self.hpc]
+        turbines = [self.lpt, self.hpt]
+        turbo_machines = compressors + turbines
+        check_dp = 5
+        # engine must have at least 0.5m clearance from ground
+        # NOTE: this means engine diameter can't be more than 3.5m
+        if self.diameter > 3.5:
+            return False
+        # axial set at 190 and 150 for compressor and turbine:
+        if not all(turbine.axial_velocity == 150 for turbine in turbines):
+            return False
+        if not all(compressor.axial_velocity == 190 for compressor in compressors):
+            return False
+        # Bypass ratio is 7
+        if self.bypass_ratio != 7:
+            return False
+        # Pressure ratio across inner fan can't exceed 1.9
+        if self.fan.inner_fan_pressure_ratio > 1.9:
+            return False
+        # Pressure ratio across compressor stages can't exceed 1.3
+        if not all(compressor.per_stage_pressure_ratio <= 1.3 for compressor in compressors):
+            return False
+        # Pressure ratio across turbine stages can't exceed 2.5
+        if not all(all(pr <= 2.5 for pr in turbine.pressure_ratios)
+                   for turbine in turbines):
+            return False
+        # Mean radius of lpc can't be more than 20% higher than inner fan
+            # NOTE:(idk about the 20% but let's just say it is)
+        if self.lpc.mean_radius > 1.2*self.fan.inner_fan_mean_radius:
+            return False
+        # Mean radius of lpt can't be less than mean radius of hpt
+        if self.lpt.mean_radius < self.hpt.mean_radius:
+            return False
+        # Mean radius of lpc can't be less than mean radius of hpc
+        if self.lpc.mean_radius < self.hpc.mean_radius:
+            return False
+        # hpc and hpt can't be too close to shaft
+            # NOTE: idk what too small means: assume 0.15m
+        if self.hpc.mean_radius - self.hpc.stages[0].blade_height / 2 < 0.15:
+            return False
+        if self.hpt.mean_radius - self.hpc.stages[-1].blade_height / 2 < 0.15:
+            return False
+        # Mean radius stays constant across stages for respective turbo machine
+        if not all(len(set(round(stage.mean_radius, check_dp)
+                           for stage in tm.stages)) <= 1 for tm in turbo_machines):
+            return False
+        # blade heights cannot be below 10mm
+        if not all(all(stage.blade_height >= 0.01 for stage in tm.stages)
+                   for tm in turbo_machines):
+            return False
+        # OPR and turbine pressure ratio should roughly match
+        turbine_pressure_ratios = np.prod(
+            np.array([t.pressure_ratio for t in turbines]))
+        higher_pressure_ratio = max(
+            turbine_pressure_ratios, self.overall_pressure_ratio)
+        lower_pressure_ratio = min(
+            turbine_pressure_ratios, self.overall_pressure_ratio)
+        if lower_pressure_ratio / higher_pressure_ratio < 0.9:
+            return False
+
+        # can't have more than 3 stages in hpt
+        if len(self.hpt.stages) > 3:
+            return False
+
+        # Mach number at blade tips cannot surpass 1.3
+        if self.fan.tip_mach_no > 1.3:
+            return False
+        if not all(all(tip_mach_no <= 1.3 for tip_mach_no in t.tip_mach_nos)
+                   for t in turbines):
+            return False
+        # Safety factor on turbine blades to be atleast 1.5-2?
+            # NOTE: idk if this can be checked
+        # a1 and a3=0 for first stage of lpc and last stage of hpc respectively
+        # b1-b2<45 for compressors
+        # 90<a1-a2<120 for turbine (flow deflection)
+        # solidity for compressors and turbine to be 0.5-1 with it being close to 0.8 for turbine
+        # Diffusion factor for compressors to be max 0.45
+        # -lift coefficient for turbines to be about 0.8
         return True
+
+    def __get_score(self):
+        compressors = [self.lpc, self.hpc]
+        turbines = [self.lpt, self.hpt]
+        turbo_machines = compressors + turbines
+        # TODO
+        score = 0
+        # Award points for low engine diameter:
+        score += act.smooth_step_down(self.diameter,
+                                      start=2,
+                                      end=3.5,
+                                      min_y=0,
+                                      max_y=10)
+        # Award points for fewer stages:
+        score += act.smooth_step_down(len(self.lpc.stages),
+                                      start=1,
+                                      end=4,
+                                      min_y=0,
+                                      max_y=1)
+        score += act.smooth_step_down(len(self.hpc.stages),
+                                      start=9,
+                                      end=14,
+                                      min_y=0,
+                                      max_y=3)
+        score += act.smooth_step_down(len(self.hpt.stages),
+                                      start=1,
+                                      end=3,
+                                      min_y=0,
+                                      max_y=4)
+        score += act.smooth_step_down(len(self.lpt.stages),
+                                      start=3,
+                                      end=6,
+                                      min_y=0,
+                                      max_y=1)
+        # Award points for similar hpc and hpt mean radii:
+        score += act.smooth_step_down(abs(self.hpc.mean_radius - self.hpt.mean_radius),
+                                      start=0,
+                                      end=self.diameter / 10,
+                                      min_y=0,
+                                      max_y=3)
+        # Award points for low mean tip mach number:
+        mean_tip_mach_nos = np.mean(
+            np.array([self.fan.tip_mach_no, max(self.lpt.tip_mach_nos), max(self.hpt.tip_mach_nos)]))
+        score += act.smooth_step_down(mean_tip_mach_nos,
+                                      start=0.6,
+                                      end=1.3,
+                                      min_y=0,
+                                      max_y=4)
+        # Award points fot similar OPR and turbine pressure ratio:
+        turbine_pressure_ratios = np.prod(
+            np.array([t.pressure_ratio for t in turbines]))
+        higher_pressure_ratio = max(
+            turbine_pressure_ratios, self.overall_pressure_ratio)
+        lower_pressure_ratio = min(
+            turbine_pressure_ratios, self.overall_pressure_ratio)
+        score += act.smooth_step_down(lower_pressure_ratio / higher_pressure_ratio,
+                                      start=0.9,
+                                      end=1,
+                                      min_y=-20,
+                                      max_y=20)
+        return score

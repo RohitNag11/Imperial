@@ -1,6 +1,6 @@
 {
     "mass_flow": 20.5,
-    "engine_diameter": 2.6,
+    "diameter": 2.6,
     "bypass_ratio": 7,
     "overall_pressure_ratio": 40,
     "fan": {
@@ -1189,5 +1189,6 @@
             }
         ]
     },
-    "is_valid": true
+    "is_valid": true,
+    "score": 15.876644355930848
 }

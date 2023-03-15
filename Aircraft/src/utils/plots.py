@@ -8,9 +8,9 @@ def draw_engine(engine):
     ax.set_title('Engine Geometry')
     ax.set_ylabel('Radius (m)')
     ax.set_xlabel('Stages')
-    ax.set_ylim(-engine.engine_diameter/2 - 0.5,
-                engine.engine_diameter/2 + 0.5)
-    draw_engine_casing(ax, engine.engine_diameter)
+    ax.set_ylim(-engine.diameter/2 - 0.5,
+                engine.diameter/2 + 0.5)
+    draw_engine_casing(ax, engine.diameter)
     draw_fan(ax, engine.fan.tip_diameter,
              engine.fan.inner_fan_tip_diameter, engine.fan.hub_diameter, 0, 'Fan')
     draw_fan(ax, -engine.fan.tip_diameter,
@@ -79,7 +79,7 @@ def draw_fan(ax, fan_tip, inner_fan_tip, fan_hub, axial_start_position, name=Non
     ax.text(z[0], tip_diameters[0] / 2 + 0.1, name, c='r')
 
 
-def draw_engine_casing(ax, engine_diameter):
+def draw_engine_casing(ax, diameter):
     ax.axhline(0, color='black', linestyle='-.')
-    ax.axhline(engine_diameter / 2, color='black', linestyle='-')
-    ax.axhline(-engine_diameter / 2, color='black', linestyle='-')
+    ax.axhline(diameter / 2, color='black', linestyle='-')
+    ax.axhline(-diameter / 2, color='black', linestyle='-')
