@@ -1,12 +1,16 @@
+from typing import Dict, Tuple, Set
 import numpy as np
 from src.turbomach_analyser import Engine
-from src.utils import plots, formatter
+from src.utils import (plots,
+                       formatter as f)
 import json
 import itertools
 import time
 import os
 from multiprocessing import Pool
 from functools import partial
+import concurrent.futures
+from tqdm import tqdm
 
 
 def get_constants():
@@ -74,57 +78,85 @@ def get_number_of_iterations():
     return int(np.prod([len(v) for v in d.values()]))
 
 
-def main(tried_vars_path, valid_vars_path):
+def main(tried_vars_dir: str, valid_vars_dir: str, pbar_ncols: int = 150):
+    # Get the constants and variable ranges for the engine
     consts_kwargs = get_constants()
     engine_consts_kwargs = get_engine_constants()
     var_ranges_dict = __get_variable_ranges()
-    all_possible_vars_dicts = ({k: v for k, v in zip(var_ranges_dict.keys(), p)}
-                               for p in itertools.product(*var_ranges_dict.values()))
-    if os.path.isfile(tried_vars_path):
-        tried_var_key_hash, tried_var_vals_hash_set = formatter.csv_to_hashed_val_set(
-            tried_vars_path)
-    else:
-        tried_var_key_hash = ''
-        tried_var_vals_hash_set = set()
-
-    if os.path.isfile(valid_vars_path):
-        valid_var_key_hash, valid_var_vals_hash_set = formatter.csv_to_hashed_val_set(
-            valid_vars_path)
-    else:
-        valid_var_key_hash = ''
-        valid_var_vals_hash_set = set()
-
+    # Generate all possible combinations of variables
+    all_possible_vars_dicts = (
+        {k: v for k, v in zip(var_ranges_dict.keys(), p)}
+        for p in itertools.product(*var_ranges_dict.values())
+    )
+    # Get the variable key hash
+    # The hash below is used to identify the variable combinations and is reversible
+    var_key_hash = f.hash_dict_keys(var_ranges_dict)
+    # The hash below is used to name the files and is not reversible
+    var_key_hash_compact = f.compact_hash_dict_keys(var_ranges_dict)
+    # Read the tried and valid variable hashes from the files
+    tried_vars_path = f'{tried_vars_dir}/{var_key_hash_compact}.csv'
+    valid_vars_path = f'{valid_vars_dir}/{var_key_hash_compact}.csv'
+    tried_var_key_hash, tried_var_vals_hash_set = f.read_vars_file(
+        tried_vars_path)
+    valid_var_key_hash, valid_var_vals_hash_set = f.read_vars_file(
+        valid_vars_path)
+    # Calculate the total number of iterations
     no_iterations = get_number_of_iterations()
     print(f'No of iterations: {no_iterations}')
-    var_key_hash = formatter.hash_dict_keys(var_ranges_dict)
-    for var_dict in all_possible_vars_dicts:
-        var_val_hash = formatter.hash_dict_vals(var_dict)
-        if var_val_hash not in tried_var_vals_hash_set or var_key_hash != tried_var_key_hash:
-            tried_var_vals_hash_set.add(var_val_hash)
-            try:
-                engine = Engine(**consts_kwargs,
-                                **engine_consts_kwargs,
-                                **var_dict)
-                if engine.is_valid:
-                    valid_var_vals_hash_set.add(var_val_hash)
-            except:
-                pass
+    # Initialize the main progress bar for processing iterations
+    with tqdm(total=no_iterations,
+              desc='Processing',
+              unit='var_dict',
+              ncols=pbar_ncols) as pbar:
+        # Initialize the progress bar for valid iterations
+        with tqdm(total=no_iterations,
+                  desc='Accepted  ',
+                  unit='var_dict',
+                  position=1,
+                  ncols=pbar_ncols,
+                  colour='CYAN') as valid_pbar:
+            # Iterate through all possible variable combinations
+            for var_dict in all_possible_vars_dicts:
+                # Get the variable value hash
+                var_val_hash = f.hash_dict_vals(var_dict)
+                # Check if the current variable combination is unprocessed or has a different key hash
+                if var_val_hash not in tried_var_vals_hash_set or var_key_hash != tried_var_key_hash:
+                    tried_var_vals_hash_set.add(var_val_hash)
+                    try:
+                        # Create an engine instance with the current variable combination
+                        engine = Engine(**consts_kwargs,
+                                        **engine_consts_kwargs,
+                                        **var_dict)
+                        # If the engine is valid, add the variable value hash to the valid set and update the valid progress bar
+                        if engine.is_valid:
+                            valid_var_vals_hash_set.add(var_val_hash)
+                            valid_pbar.update(1)
+                    except:
+                        pass
+                # Update the main progress bar
+                pbar.update(1)
+    # Update the tried and valid variable key hashes if they differ from the current key hash
     if var_key_hash != tried_var_key_hash:
-        tried_var_key_hash = var_key_hash
-        valid_var_key_hash = var_key_hash
-    formatter.hashed_vals_to_csv(tried_var_key_hash,
-                                 tried_var_vals_hash_set,
-                                 tried_vars_path)
-    formatter.hashed_vals_to_csv(valid_var_key_hash,
-                                 valid_var_vals_hash_set,
-                                 valid_vars_path)
-    print(f'No of valid iterations: {len(valid_var_vals_hash_set)}')
+        tried_var_key_hash = valid_var_key_hash = var_key_hash
+    # Save the tried and valid variable hashes to the files
+    f.hashed_vals_to_csv(tried_var_key_hash,
+                         tried_var_vals_hash_set,
+                         tried_vars_path)
+    f.hashed_vals_to_csv(valid_var_key_hash,
+                         valid_var_vals_hash_set,
+                         valid_vars_path)
+    print(f'\nNo of valid iterations: {len(valid_var_vals_hash_set)}')
 
 
 if __name__ == '__main__':
-    tried_variables_path = 'tried_variables_combinations.csv'
-    valid_variables_path = 'valid_variables_combinations.csv'
+    tried_variables_dir = 'Aircraft/data/VariablesData/Tried'
+    valid_variables_dir = 'Aircraft/data/VariablesData/Valid'
     st = time.time()
-    main(tried_variables_path, valid_variables_path)
+    main(tried_variables_dir,
+         valid_variables_dir,
+         pbar_ncols=150)
+    # valid_variables_list = f.read_hashed_file_to_dict_list(
+    #     valid_variables_path)
+    # print(valid_variables_list[0])
     et = time.time()
-    print(f'runtime: {formatter.format_elapsed_time(et - st)}')
+    print(f'runtime: {f.format_elapsed_time(et - st)}')

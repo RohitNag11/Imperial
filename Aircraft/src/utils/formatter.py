@@ -1,8 +1,10 @@
+from typing import Dict, Tuple, Set
 import hashlib
 import struct
 import json
 import numpy as np
 import base64
+import os
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -43,48 +45,65 @@ def save_obj_to_file(obj, filename):
         json.dump(json.loads(json_str), file, indent=4)
 
 
-def format_elapsed_time(elapsed_time):
-    hours = int(elapsed_time / 3600)
-    minutes = int((elapsed_time % 3600) / 60)
-    seconds = int(elapsed_time % 60)
+def format_elapsed_time(elapsed_time: float) -> str:
+    hours, remainder = divmod(int(elapsed_time), 3600)
+    minutes, seconds = divmod(remainder, 60)
     milliseconds = int((elapsed_time - int(elapsed_time)) * 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02}:{milliseconds:03}"
 
 
-def hash_dict_keys(d: dict):
-    sorted_dict = {k: d[k] for k in sorted(d)}
-    keys_hash = ','.join(sorted_dict.keys())
-    return keys_hash
+def sort_dict(d: Dict) -> Dict:
+    return {k: d[k] for k in sorted(d)}
 
 
-def hash_dict_vals(d: dict):
-    sorted_dict = {k: d[k] for k in sorted(d)}
-    sorted_dict_vals = sorted_dict.values()
-    sorted_dict_vals_str = list(map(str, sorted_dict_vals))
-    vals_hash = ','.join(sorted_dict_vals_str)
-    return vals_hash
+def hash_dict_keys(d: Dict) -> str:
+    return ','.join(sort_dict(d).keys())
 
 
-def unhash_dict(keys_hash, vals_hash):
-    keys = keys_hash.split(',')
-    vals_str = vals_hash.split(',')
-    vals = list(map(float, vals_str))
-    return {k: v for k, v in zip(keys, vals)}
+def compact_hash_dict_keys(d: Dict) -> str:
+    keys = sort_dict(d).keys()
+    return '_'.join(''.join(word[0] for word in s.split('_')) for s in keys)
 
 
-def hashed_vals_to_csv(key_hash: str, hashed_vals_set: set, filename: str):
+def hash_dict_vals(d: Dict) -> str:
+    return ','.join(map(str, sort_dict(d).values()))
+
+
+def unhash_dict(keys_hash: str, vals_hash: str) -> Dict:
+    keys, vals_str = keys_hash.split(','), vals_hash.split(',')
+    return dict(zip(keys, map(float, vals_str)))
+
+
+def hashed_vals_to_csv(key_hash: str, hashed_vals_set: Set[str], filename: str):
     with open(filename, 'w') as f:
-        # Write the keys hash as the first line:
-        f.write(key_hash + '\n')
-        for val_hash in hashed_vals_set:
-            f.write(val_hash + '\n')
+        f.write(f"{key_hash}\n")
+        f.writelines(f"{val_hash}\n" for val_hash in hashed_vals_set)
 
 
-def csv_to_hashed_val_set(filename: str):
-    hashed_val_set = set()
+def csv_to_hashed_val_set(filename: str) -> Tuple[str, Set[str]]:
     with open(filename, 'r') as f:
-        key_hash = f.readline().strip('\n')
-        for line in f.readlines()[1:]:
-            val_hash = line.strip('\n')
-            hashed_val_set.add(val_hash)
-    return key_hash, hashed_val_set
+        lines = [line.strip() for line in f]
+    return lines[0], set(lines[1:])
+
+
+def read_vars_file(filepath: str) -> Tuple[str, Set[str]]:
+    return csv_to_hashed_val_set(filepath) if os.path.isfile(filepath) else ('', set())
+
+
+def read_hashed_file_to_dict_list(filename: str):
+    # Read the key hash and value hashes from the file
+    key_hash, hashed_val_set = csv_to_hashed_val_set(filename)
+    # Split the key hash into a list of keys
+    keys = key_hash.split(',')
+    # Initialize an empty list to store the dictionaries
+    dict_list = []
+    # Iterate through the value hashes
+    for val_hash in hashed_val_set:
+        # Split the value hash into a list of values and convert them to float
+        vals_str = val_hash.split(',')
+        vals = list(map(float, vals_str))
+        # Create a dictionary by mapping the keys to their corresponding values
+        var_dict = {k: v for k, v in zip(keys, vals)}
+        # Add the dictionary to the list
+        dict_list.append(var_dict)
+    return dict_list

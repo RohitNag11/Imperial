@@ -56,10 +56,12 @@ def get_engine_constants():
 
 
 def main():
+    engine_name = 'TEST_ENGINE_1'
     engine = Engine(**get_constants(), **get_engine_constants())
     components = [engine.fan, engine.lpc, engine.hpc, engine.hpt, engine.lpt]
     [print(f'{component}\n*****\n') for component in components]
-    formatter.save_obj_to_file(engine, 'Aircraft/engine_design.json')
+    formatter.save_obj_to_file(
+        engine, f'Aircraft/data/EngineData/{engine_name}.json')
     plots.draw_engine(engine)
 
 
