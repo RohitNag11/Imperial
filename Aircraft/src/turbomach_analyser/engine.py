@@ -172,7 +172,11 @@ class Engine:
             return False
         # Mean radius of lpc can't be more than 20% higher than inner fan
             # NOTE:(idk about the 20% but let's just say it is)
-        if self.lpc.mean_radius > 1.2*self.fan.inner_fan_mean_radius:
+        if self.lpc.mean_radius > 1.2 * self.fan.inner_fan_mean_radius:
+            return False
+        # Mean radius of lpc can't be more than 30% higher than inner fan
+            # NOTE:(idk about the 30% but let's just say it is)
+        if self.lpt.mean_radius > 1.3 * self.fan.inner_fan_mean_radius:
             return False
         # Mean radius of lpt can't be less than mean radius of hpt
         if self.lpt.mean_radius < self.hpt.mean_radius:
@@ -248,10 +252,10 @@ class Engine:
                                       min_y=0,
                                       max_y=3)
         score += act.smooth_step_down(len(self.hpt.stages),
-                                      start=1,
+                                      start=0,
                                       end=3,
-                                      min_y=0,
-                                      max_y=4)
+                                      min_y=-10,
+                                      max_y=10)
         score += act.smooth_step_down(len(self.lpt.stages),
                                       start=3,
                                       end=6,

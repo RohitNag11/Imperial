@@ -1,6 +1,6 @@
 import numpy as np
 from src.turbomach_analyser import Engine
-from src.utils import plots, formatter
+from src.utils import plots, formatter as f
 import json
 
 
@@ -16,7 +16,6 @@ def get_constants():
 def get_engine_constants():
     return {
         'mass_flow': 20.5,
-        'engine_diameter': 2.6,
         'bypass_ratio': 7,
         'overall_pressure_ratio': 40,
         'fan_hub_tip_ratio': 0.35,
@@ -28,12 +27,6 @@ def get_engine_constants():
         'turbine_isentropic_efficiency': 0.92,
         'lpc_pressure_ratio': 2.5,
         'per_stage_pressure_ratio': 1.3,
-        'lpt_work_coefficient': 2.5,
-        'hpt_work_coefficient': 0.8,
-        'hpt_angular_velocity': 1250,
-        'hpt_min_blade_length': 0.02,
-        'min_blade_length': 0.012,
-        'lpt_min_blade_length': 0.03,
         'P_025': 91802,
         'T_025': 331.86,
         'P_03': 1468830,
@@ -55,15 +48,40 @@ def get_engine_constants():
     }
 
 
-def main():
-    engine_name = 'TEST_ENGINE_1'
-    engine = Engine(**get_constants(), **get_engine_constants())
+def get_engine_variables():
+    return {
+        'engine_diameter': 2.6,
+        'hpt_angular_velocity': 1250,
+        'hpt_min_blade_length': 0.02,
+        'hpt_work_coefficient': 0.8,
+        'lpt_min_blade_length': 0.03,
+        'lpt_work_coefficient': 2.5,
+        'min_blade_length': 0.012
+    }
+
+
+def get_engine_vars_from_file(valid_variables_path):
+    valid_variables_list = f.read_hashed_file_to_dict_list(
+        valid_variables_path, sort_key='engine_score', reverse=True)
+    # Get the engine variables with the highest score
+    valid_variables_list[0].pop('engine_score', None)
+    return valid_variables_list[0]
+
+
+def main(engine_variables_path=None):
+    engine_name = 'TEST_ENGINE_1' if not engine_variables_path else engine_variables_path.split(
+        '/')[-1].split('.')[0]
+    engine_variables = get_engine_vars_from_file(
+        engine_variables_path) if engine_variables_path else get_engine_variables()
+    engine = Engine(**get_constants(), **get_engine_constants(),
+                    **engine_variables)
     components = [engine.fan, engine.lpc, engine.hpc, engine.hpt, engine.lpt]
     [print(f'{component}\n*****\n') for component in components]
-    formatter.save_obj_to_file(
+    f.save_obj_to_file(
         engine, f'Aircraft/data/EngineData/{engine_name}.json')
     plots.draw_engine(engine)
 
 
 if __name__ == '__main__':
-    main()
+    engine_variables_path = f'Aircraft/data/VariablesData/Valid/ed_hav_hmbl_hwc_lmbl_lwc_mbl.csv'
+    main(engine_variables_path)

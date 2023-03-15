@@ -65,7 +65,7 @@ def __get_variable_ranges():
         'hpt_angular_velocity': np.linspace(700, 1500, 5, endpoint=True),
         'min_blade_length': np.linspace(0.012, 0.015, 3, endpoint=True),
         'hpt_min_blade_length': np.linspace(0.012, 0.03, 5, endpoint=True),
-        'lpt_min_blade_length': np.linspace(0.015, 0.05, 3, endpoint=True),
+        'lpt_min_blade_length': np.linspace(0.012, 0.05, 5, endpoint=True),
         # 'compressor_reaction_mean': np.linspace(0.2, 1, 4, endpoint=False),
         # 'compressor_diffusion_factor': np.linspace(2.5, 3.5, 1, endpoint=True),
         # 'turbine_reaction_mean': np.linspace(0.2, 1, 4, endpoint=False),
@@ -127,9 +127,10 @@ def main(tried_vars_dir: str, valid_vars_dir: str, pbar_ncols: int = 150):
                         engine = Engine(**consts_kwargs,
                                         **engine_consts_kwargs,
                                         **var_dict)
-                        # If the engine is valid, add the variable value hash to the valid set and update the valid progress bar
+                        # If the engine is valid, add the variable value hash with engine score to the valid set and update the valid progress bar
                         if engine.is_valid:
-                            valid_var_vals_hash_set.add(var_val_hash)
+                            valid_var_vals_hash_set.add(
+                                var_val_hash + f',{engine.score}')
                             valid_pbar.update(1)
                     except:
                         pass
@@ -137,7 +138,8 @@ def main(tried_vars_dir: str, valid_vars_dir: str, pbar_ncols: int = 150):
                 pbar.update(1)
     # Update the tried and valid variable key hashes if they differ from the current key hash
     if var_key_hash != tried_var_key_hash:
-        tried_var_key_hash = valid_var_key_hash = var_key_hash
+        tried_var_key_hash = var_key_hash
+        valid_var_key_hash = var_key_hash + ',engine_score'
     # Save the tried and valid variable hashes to the files
     f.hashed_vals_to_csv(tried_var_key_hash,
                          tried_var_vals_hash_set,
@@ -152,11 +154,10 @@ if __name__ == '__main__':
     tried_variables_dir = 'Aircraft/data/VariablesData/Tried'
     valid_variables_dir = 'Aircraft/data/VariablesData/Valid'
     st = time.time()
+
     main(tried_variables_dir,
          valid_variables_dir,
          pbar_ncols=150)
-    # valid_variables_list = f.read_hashed_file_to_dict_list(
-    #     valid_variables_path)
-    # print(valid_variables_list[0])
+
     et = time.time()
     print(f'runtime: {f.format_elapsed_time(et - st)}')

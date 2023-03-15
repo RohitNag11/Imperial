@@ -90,7 +90,7 @@ def read_vars_file(filepath: str) -> Tuple[str, Set[str]]:
     return csv_to_hashed_val_set(filepath) if os.path.isfile(filepath) else ('', set())
 
 
-def read_hashed_file_to_dict_list(filename: str):
+def read_hashed_file_to_dict_list(filename: str, sort_key: str = None, reverse: bool = False):
     # Read the key hash and value hashes from the file
     key_hash, hashed_val_set = csv_to_hashed_val_set(filename)
     # Split the key hash into a list of keys
@@ -106,4 +106,6 @@ def read_hashed_file_to_dict_list(filename: str):
         var_dict = {k: v for k, v in zip(keys, vals)}
         # Add the dictionary to the list
         dict_list.append(var_dict)
+    if sort_key is not None:
+        return sorted(dict_list, key=lambda d: d[sort_key], reverse=reverse)
     return dict_list
