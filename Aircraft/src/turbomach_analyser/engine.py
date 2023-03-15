@@ -132,9 +132,14 @@ class Engine:
                               SPEC_HEAT_RATIO=SPEC_HEAT_RATIO,
                               GAS_CONST=GAS_CONST,
                               SPEC_HEAT_CAPACITY=SPEC_HEAT_CAPACITY)
+        self.is_valid = self.__check_validity()
         return
 
     def __get_T_021(self):
         # TODO
         # thermo.get_static_temp
         return 260.73
+
+    def __check_validity(self):
+        # TODO
+        return True
