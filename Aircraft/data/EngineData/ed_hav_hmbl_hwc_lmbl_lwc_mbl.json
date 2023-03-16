@@ -17,7 +17,8 @@
         "_Fan__SPEC_HEAT_RATIO": 1.4,
         "_Fan__GAS_CONST": 287,
         "_Fan__TEMP_SEA": 288.15,
-        "angular_velocity": 306.4631415097091
+        "angular_velocity": 306.4631415097091,
+        "is_valid": true
     },
     "hpt": {
         "_TurboComponent__SPEC_HEAT_RATIO": 1.4,
@@ -127,7 +128,8 @@
                 },
                 "solidity": 0.2904635271580997,
                 "aspect_ratio": 1,
-                "no_of_blades": 104.36989785803723
+                "no_of_blades": 104.36989785803723,
+                "is_valid": true
             },
             {
                 "number": 2,
@@ -171,7 +173,8 @@
                 },
                 "solidity": 0.2904635271580997,
                 "aspect_ratio": 1,
-                "no_of_blades": 57.358917251151404
+                "no_of_blades": 57.358917251151404,
+                "is_valid": true
             },
             {
                 "number": 3,
@@ -215,9 +218,11 @@
                 },
                 "solidity": 0.2904635271580997,
                 "aspect_ratio": 1,
-                "no_of_blades": 39.54623857026598
+                "no_of_blades": 39.54623857026598,
+                "is_valid": true
             }
-        ]
+        ],
+        "is_valid": true
     },
     "lpt": {
         "_TurboComponent__SPEC_HEAT_RATIO": 1.4,
@@ -334,7 +339,8 @@
                 },
                 "solidity": 0.3493858184830107,
                 "aspect_ratio": 1,
-                "no_of_blades": 263.23223544280864
+                "no_of_blades": 263.23223544280864,
+                "is_valid": true
             },
             {
                 "number": 2,
@@ -378,7 +384,8 @@
                 },
                 "solidity": 0.3493858184830107,
                 "aspect_ratio": 1,
-                "no_of_blades": 144.73748349516015
+                "no_of_blades": 144.73748349516015,
+                "is_valid": true
             },
             {
                 "number": 3,
@@ -422,7 +429,8 @@
                 },
                 "solidity": 0.3493858184830107,
                 "aspect_ratio": 1,
-                "no_of_blades": 99.80843008573196
+                "no_of_blades": 99.80843008573196,
+                "is_valid": true
             },
             {
                 "number": 4,
@@ -466,9 +474,11 @@
                 },
                 "solidity": 0.3493858184830107,
                 "aspect_ratio": 1,
-                "no_of_blades": 76.16536495037376
+                "no_of_blades": 76.16536495037376,
+                "is_valid": true
             }
-        ]
+        ],
+        "is_valid": true
     },
     "lpc": {
         "_TurboComponent__SPEC_HEAT_RATIO": 1.4,
@@ -561,7 +571,8 @@
                 },
                 "solidity": 0.41491606789092006,
                 "aspect_ratio": 1,
-                "no_of_blades": 146.16022414914394
+                "no_of_blades": 146.16022414914394,
+                "is_valid": true
             },
             {
                 "number": 2,
@@ -605,9 +616,11 @@
                 },
                 "solidity": 0.41491606789092006,
                 "aspect_ratio": 1,
-                "no_of_blades": 165.89108380901948
+                "no_of_blades": 165.89108380901948,
+                "is_valid": true
             }
-        ]
+        ],
+        "is_valid": true
     },
     "hpc": {
         "_TurboComponent__SPEC_HEAT_RATIO": 1.4,
@@ -745,7 +758,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 31.094307007724677
+                "no_of_blades": 31.094307007724677,
+                "is_valid": true
             },
             {
                 "number": 2,
@@ -789,7 +803,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 34.05015002079879
+                "no_of_blades": 34.05015002079879,
+                "is_valid": true
             },
             {
                 "number": 3,
@@ -833,7 +848,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 37.626994089197034
+                "no_of_blades": 37.626994089197034,
+                "is_valid": true
             },
             {
                 "number": 4,
@@ -877,7 +893,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 42.04351164163535
+                "no_of_blades": 42.04351164163535,
+                "is_valid": true
             },
             {
                 "number": 5,
@@ -921,7 +938,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 47.63469630668831
+                "no_of_blades": 47.63469630668831,
+                "is_valid": true
             },
             {
                 "number": 6,
@@ -965,7 +983,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 54.94107166334276
+                "no_of_blades": 54.94107166334276,
+                "is_valid": true
             },
             {
                 "number": 7,
@@ -1009,7 +1028,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 64.89487292788307
+                "no_of_blades": 64.89487292788307,
+                "is_valid": true
             },
             {
                 "number": 8,
@@ -1053,7 +1073,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 79.25339396028912
+                "no_of_blades": 79.25339396028912,
+                "is_valid": true
             },
             {
                 "number": 9,
@@ -1097,7 +1118,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 101.77107640840082
+                "no_of_blades": 101.77107640840082,
+                "is_valid": true
             },
             {
                 "number": 10,
@@ -1141,7 +1163,8 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 142.16272251431053
+                "no_of_blades": 142.16272251431053,
+                "is_valid": true
             },
             {
                 "number": 11,
@@ -1185,9 +1208,11 @@
                 },
                 "solidity": 0.42332353706222176,
                 "aspect_ratio": 1,
-                "no_of_blades": 235.71501436439792
+                "no_of_blades": 235.71501436439792,
+                "is_valid": true
             }
-        ]
+        ],
+        "is_valid": true
     },
     "is_valid": true,
     "score": 9.04291309636989

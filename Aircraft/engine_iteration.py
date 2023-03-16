@@ -1,15 +1,8 @@
-from typing import Dict, Tuple, Set, Iterable
 import numpy as np
 from src.turbomach_analyser import Engine
-from src.utils import (plots,
-                       formatter as f)
-import json
+from src.utils import formatter as f
 import itertools
 import time
-import os
-from multiprocessing import Pool
-from functools import partial
-import concurrent.futures
 from tqdm import tqdm
 
 
@@ -54,6 +47,7 @@ def get_engine_constants():
         'turbine_reaction_hub': 0.5,
         'compressor_diffusion_factor': 0.45,
         'turbine_lift_coeff': 1,
+        'check_dp': 5,
     }
 
 
@@ -103,10 +97,6 @@ def __get_variable_ranges_from_file(valid_variables_path, per_var_iterations):
         # Sort the list after removing duplicates
         result[key].sort()
     return result
-
-
-def get_number_of_iterations(range_dict):
-    return int(np.prod([len(v) for v in range_dict.values()]))
 
 
 def generate_possible_var_dicts(var_ranges_dict):

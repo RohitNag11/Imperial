@@ -66,6 +66,7 @@ class Stage:
         self.solidity = self.get_solidity()
         self.aspect_ratio = 1
         self.no_of_blades = self.get_no_of_blades()
+        self.is_valid = self.__check_validity()
 
     def get_blade_angles_at_mean_radius(self):
         # make phi and si negative if compressor.
@@ -153,3 +154,9 @@ class Stage:
 
     def get_no_of_blades(self):
         return 2 * np.pi * self.mean_radius * self.aspect_ratio / self.blade_height
+
+    def __check_validity(self):
+        # blade heights cannot be below 10mm
+        if self.blade_height < 0.01:
+            return False
+        return True

@@ -29,6 +29,7 @@ class Fan:
         self.__GAS_CONST = GAS_CONST
         self.__TEMP_SEA = TEMP_SEA
         self.angular_velocity = self.__get_angular_velocity()
+        self.is_valid = self.__check_validity()
 
     def __str__(self):
         properties = {f'Fan tip diameter: {self.tip_diameter}',
@@ -45,3 +46,12 @@ class Fan:
 
     def __get_inner_fan_tip_diameter(self, bypass_ratio):
         return self.tip_diameter * ((1 + bypass_ratio * self.hub_tip_ratio**2) / (1 + bypass_ratio))**0.5
+
+    def __check_validity(self):
+        # Inner fan pressure ratio should be less than 1.9
+        if self.inner_fan_pressure_ratio > 1.9:
+            return False
+        # Tip mach number should be less than 1.5
+        if self.tip_mach_no > 1.3:
+            return False
+        return True

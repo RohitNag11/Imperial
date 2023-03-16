@@ -1,7 +1,6 @@
 import numpy as np
 from src.turbomach_analyser import Engine
 from src.utils import plots, formatter as f
-import json
 
 
 def get_constants():
@@ -44,7 +43,8 @@ def get_engine_constants():
         'turbine_reaction_mean': 0.5,
         'turbine_reaction_tip': 0.5,
         'turbine_reaction_hub': 0.5,
-        'turbine_lift_coeff': 1
+        'turbine_lift_coeff': 1,
+        'check_dp': 5,
     }
 
 
@@ -69,7 +69,7 @@ def get_engine_vars_from_file(valid_variables_path):
 
 
 def main(engine_variables_path=None):
-    engine_name = 'TEST_ENGINE_1' if not engine_variables_path else engine_variables_path.split(
+    engine_name = 'TEST_ENGINE' if not engine_variables_path else engine_variables_path.split(
         '/')[-1].split('.')[0]
     engine_variables = get_engine_vars_from_file(
         engine_variables_path) if engine_variables_path else get_engine_variables()
@@ -83,5 +83,9 @@ def main(engine_variables_path=None):
 
 
 if __name__ == '__main__':
+    # Run optimal engine design:
     engine_variables_path = f'Aircraft/data/VariablesData/Valid/ed_hav_hmbl_hwc_lmbl_lwc_mbl.csv'
     main(engine_variables_path)
+
+    # Run test engine design:
+    # main()

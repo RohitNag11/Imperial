@@ -24,6 +24,7 @@ class Turbine(TurboComponent):
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
+                 check_dp=5,
                  **kwargs):
         super().__init__(mass_flow,
                          axial_velocity,
@@ -65,6 +66,7 @@ class Turbine(TurboComponent):
                              reaction_hub=reaction_hub,
                              reaction_tip=reaction_tip,
                              lift_coeff=lift_coeff) for i in range(self.no_of_stages)]
+        self.is_valid = self.__check_validity(check_dp)
 
     def __str__(self):
         properties = {f'{self.name} no of stages: {self.no_of_stages}',
@@ -119,3 +121,37 @@ class Turbine(TurboComponent):
             static_temps, SPEC_HEAT_RATIO, GAS_CONST)
         tip_mach_nos = u_tips / speed_of_sounds
         return tip_mach_nos
+
+    def __check_validity(self, check_dp):
+        # Axial velocity should be 150 m/s
+        if self.axial_velocity != 150:
+            return False
+        # Per-stage pressure ratio should be less than 2.5
+        if not all(pr <= 2.5 for pr in self.pressure_ratios):
+            return False
+        # Mean radius stays contants across stages:
+        if not len(set(round(stage.mean_radius, check_dp)
+                       for stage in self.stages)) <= 1:
+            return False
+
+        # For LPT:
+        if self.is_low_pressure:
+            # LPT can't be too close to the shaft
+            # # NOTE: idk what too close means: assume 0.15m
+            if self.mean_radius - self.stages[-1].blade_height / 2 < 0.15:
+                return False
+        # For HPT:
+        else:
+            # can't have more than 3 stages in hpt
+            if len(self.stages) > 3:
+                return False
+
+        # Mach number at blade tips cannot surpass 1.3
+        if not all(tip_mach_no <= 1.3 for tip_mach_no in self.tip_mach_nos):
+            return False
+
+        # All stages must be valid
+        if not all(stage.is_valid for stage in self.stages):
+            return False
+
+        return True

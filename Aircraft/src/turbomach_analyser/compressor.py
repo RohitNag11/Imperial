@@ -23,6 +23,7 @@ class Compressor(TurboComponent):
                  SPEC_HEAT_RATIO=1.4,
                  GAS_CONST=287,
                  SPEC_HEAT_CAPACITY=1005,
+                 check_dp=5,
                  ** kwargs):
         super().__init__(mass_flow,
                          axial_velocity,
@@ -46,10 +47,10 @@ class Compressor(TurboComponent):
         # self.tip_mach_nos = self.__get_tip_mach_nos(SPEC_HEAT_RATIO, GAS_CONST)
         self.d_stag_enthalpy = thermo.get_delta_stag_enthalpy(
             self.T0_exit - self.T0_inlet, SPEC_HEAT_CAPACITY)
-        # self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
         self.flow_coeff = self.axial_velocity / self.tangential_speed
         # NOTE: FIX WORK COEFF
         self.work_coeff = 0.5
+        # self.work_coeff = self.__get_work_coefficient(SPEC_HEAT_CAPACITY)
         self.stages = [Stage(is_compressor_stage=True,
                              number=i + 1,
                              flow_coeff=self.flow_coeff,
@@ -62,6 +63,7 @@ class Compressor(TurboComponent):
                              reaction_hub=reaction_hub,
                              reaction_tip=reaction_tip,
                              diffusion_factor=diffusion_factor) for i in range(self.no_of_stages)]
+        self.is_valid = self.__check_validity(check_dp)
 
     def __str__(self):
         properties = {f'{self.name} tip diameter: {self.tip_diameters}',
@@ -90,3 +92,26 @@ class Compressor(TurboComponent):
 
     def __get_work_coefficient(self, SPEC_HEAT_CAPACITY):
         return self.d_stag_enthalpy / (self.no_of_stages * self.tangential_speed ** 2)
+
+    def __check_validity(self, check_dp):
+        # Axial set at 190 for compressors:
+        if self.axial_velocity != 190:
+            return False
+        # Pressure ratio across compressor stages can't exceed 1.3
+        if self.per_stage_pressure_ratio > 1.3:
+            return False
+        # Mean radius stays contants across stages:
+        if not len(set(round(stage.mean_radius, check_dp)
+                       for stage in self.stages)) <= 1:
+            return False
+        # For HPC:
+        if not self.is_low_pressure:
+            # HPC can't be too close to the shaft
+            # NOTE: idk what too close means: assume 0.15m
+            if self.mean_radius - self.stages[0].blade_height / 2 < 0.15:
+                return False
+
+        # All stages must be valid
+        if not all(stage.is_valid for stage in self.stages):
+            return False
+        return True
